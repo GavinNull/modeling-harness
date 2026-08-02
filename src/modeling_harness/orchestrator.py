@@ -20,6 +20,7 @@ from typing import Any, Protocol
 from uuid import uuid4
 
 from modeling_harness.config import load_yaml
+from modeling_harness.codex_adapter import codex_agent_entrypoint
 from modeling_harness.agent_body import (
     AgentBodyControlAuthorizationV1,
     AgentBodyMergeV1,
@@ -661,7 +662,10 @@ class Orchestrator:
             ),
             review_context=review_context,
             forbidden_workspace_roots=tuple(self._workspace_roots),
-            entrypoint=("modeling-harness-agent", role_id),
+            entrypoint=codex_agent_entrypoint(
+                role_id,
+                project_root=self.project_root,
+            ),
         )
         plan = self._backend.plan(request)
         task_packet: dict[str, Any] = {

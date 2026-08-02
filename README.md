@@ -14,17 +14,18 @@ rollback, and reporting remain separate.
 ## Source-freeze and release state
 
 The promotable source-freeze record is
-`generic-agent-v2.5-source-freeze-s001`, classified
+`generic-agent-v2.5-source-freeze-s002`, classified
 `SOURCE_FROZEN_DIAGNOSTIC_CANDIDATE`. It binds the independently reproduced
-seven-member successor source manifest. The earlier v2.5 freeze with SHA-256
-`d5713697043ff2582118c21f5328fc65114c885a070124e2d6dc947685322e6a`
-remains immutable historical evidence and does not identify this successor.
+ten-member cross-component source manifest. The s001 freeze with SHA-256
+`3a706c7064a4bf54b038442c1d890e3a29ee365b47704a84a5315acc3938c846`
+remains immutable historical evidence and does not identify s002.
 
-Runtime isolation is `UNSEALED`; runtime eligibility, formal release, production
-eligibility, and formal generalization are `NO` / `CLOSED`. The independent
-reproducibility review establishes source-freeze eligibility only. No opaque
-exact-candidate release receipt is present. Historical modeling-plane evidence
-is predecessor context only and is not exact-identity evaluation of s001.
+The deterministic P0 container-startup parameter contract is closed for the
+exact s002 source: the bundled worker entrypoint receives the canonical
+`--role` and `--charter` arguments through the adapter/orchestrator chain.
+Docker execution and a runtime seal were not established. Runtime eligibility,
+production eligibility, formal release, and formal generalization remain
+`NO` / `CLOSED`; no opaque exact-candidate release receipt is present.
 
 ## Commands
 
@@ -36,5 +37,5 @@ modeling-harness doctor --project-root .
 ```
 
 The equivalent source-tree form is `python -m modeling_harness.cli <command>`.
-Production execution requires a positively verified isolated backend;
-host-side source verification does not seal the runtime.
+Host-side source verification and P0 parameter-contract closure do not seal the
+runtime or establish production readiness.
