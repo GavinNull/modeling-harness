@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:modeling-harness:schema:review-packet:1.0.0",
+  "title": "ReviewPacket",
+  "description": "独立评审的原始审计记录；其可见范围固定为主 Agent，禁止直接发送给构建角色。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "packet_id",
+    "review_id",
+    "task_id",
+    "run_id",
+    "reviewer_role_id",
+    "candidate_manifest_sha256",
+    "review_profile",
+    "visibility",
+    "independence_attestation",
+    "verdict",
+    "criteria_results",
+    "defects",
+    "completed_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "packet_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "review_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "task_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "run_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "reviewer_role_id": {
+      "enum": [
+        "mathematical_reviewer",
+        "reproducibility_reviewer",
+        "evidence_communication_reviewer"
+      ]
+    },
+    "candidate_manifest_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "review_profile": {
+      "enum": [
+        "mathematical-logic",
+        "numerical-reproducibility",
+        "evidence-communication"
+      ]
+    },
+    "visibility": {
+      "const": "main-agent-only"
+    },
+    "independence_attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fresh_environment",
+        "no_author_state",
+        "no_other_review_seen",
+        "input_hashes_verified"
+      ],
+      "properties": {
+        "fresh_environment": {
+          "const": true
+        },
+        "no_author_state": {
+          "const": true
+        },
+        "no_other_review_seen": {
+          "const": true
+        },
+        "input_hashes_verified": {
+          "const": true
+        }
+      }
+    },
+    "verdict": {
+      "enum": [
+        "pass",
+        "revise",
+        "reject"
+      ]
+    },
+    "criteria_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "criterion_id",
+          "outcome",
+          "evidence_refs"
+        ],
+        "properties": {
+          "criterion_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "outcome": {
+            "enum": [
+              "pass",
+              "fail",
+              "inconclusive",
+              "not-applicable"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/evidenceReference"
+            }
+          }
+        }
+      }
+    },
+    "defects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "defect_id",
+          "capability_category",
+          "severity",
+          "description",
+          "evidence_refs",
+          "reproduction_steps",
+          "acceptance_test",
+          "contains_task_specific_evidence"
+        ],
+        "properties": {
+          "defect_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "capability_category": {
+            "$ref": "#/$defs/capabilityCategory"
+          },
+          "severity": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/evidenceReference"
+            }
+          },
+          "reproduction_steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "acceptance_test": {
+            "type": "string",
+            "minLength": 1
+          },
+          "contains_task_specific_evidence": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{2,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "capabilityCategory": {
+      "enum": [
+        "definition",
+        "understanding",
+        "creation",
+        "validation",
+        "runtime-orchestration"
+      ]
+    },
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_id",
+        "content_sha256",
+        "locator"
+      ],
+      "properties": {
+        "artifact_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "content_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

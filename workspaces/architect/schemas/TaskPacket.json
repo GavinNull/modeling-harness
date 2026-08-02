@@ -1,0 +1,419 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:modeling-harness:schema:task-packet:1.0.0",
+  "title": "TaskPacket",
+  "description": "主 Agent 向单个 Subagent 派发的不可变任务契约。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "packet_id",
+    "task_id",
+    "run_id",
+    "attempt_id",
+    "role_id",
+    "task_purpose",
+    "objective",
+    "scope",
+    "input_artifacts",
+    "allowed_tools",
+    "required_deliverables",
+    "acceptance_criteria",
+    "workspace",
+    "prompt",
+    "benchmark_access_level",
+    "execution_limits",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "packet_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "task_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "run_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "attempt_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "parent_packet_id": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/identifier"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "role_id": {
+      "$ref": "#/$defs/roleIdentifier"
+    },
+    "task_purpose": {
+      "enum": [
+        "task-answer",
+        "evaluation",
+        "generic-governance",
+        "role-identity",
+        "agent-core-modification"
+      ]
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 12000
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "in",
+        "out"
+      ],
+      "properties": {
+        "in": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        },
+        "out": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        }
+      }
+    },
+    "input_artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifactReference"
+      },
+      "uniqueItems": true
+    },
+    "allowed_tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tool_id",
+          "access"
+        ],
+        "properties": {
+          "tool_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.:-]{1,127}$"
+          },
+          "access": {
+            "enum": [
+              "read",
+              "execute",
+              "write-scoped"
+            ]
+          },
+          "constraints": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "required_deliverables": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "deliverable_id",
+          "description",
+          "media_type"
+        ],
+        "properties": {
+          "deliverable_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "media_type": {
+            "type": "string",
+            "pattern": "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$"
+          },
+          "required_sections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "criterion_id",
+          "description",
+          "evidence_type",
+          "hard_gate"
+        ],
+        "properties": {
+          "criterion_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_type": {
+            "enum": [
+              "artifact",
+              "test",
+              "metric",
+              "review",
+              "attestation"
+            ]
+          },
+          "hard_gate": {
+            "type": "boolean"
+          },
+          "threshold": {
+            "type": [
+              "number",
+              "integer",
+              "string",
+              "boolean"
+            ]
+          }
+        }
+      }
+    },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workspace_id",
+        "container_id",
+        "write_root",
+        "read_only_mounts",
+        "fresh_environment_required"
+      ],
+      "properties": {
+        "workspace_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "container_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "write_root": {
+          "type": "string",
+          "pattern": "^/runs/[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+/[a-z][a-z0-9_]{1,63}/[a-zA-Z0-9_.-]+/?$"
+        },
+        "read_only_mounts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^/inputs/[a-zA-Z0-9_./-]+$"
+          },
+          "uniqueItems": true
+        },
+        "fresh_environment_required": {
+          "const": true
+        }
+      }
+    },
+    "prompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt_id",
+        "version",
+        "sha256"
+      ],
+      "properties": {
+        "prompt_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "benchmark_access_level": {
+      "enum": [
+        "none",
+        "public-task",
+        "sealed-input",
+        "hidden-benchmark-admin"
+      ]
+    },
+    "execution_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wall_time_seconds",
+        "cpu_cores",
+        "memory_mb",
+        "disk_mb",
+        "network_policy"
+      ],
+      "properties": {
+        "wall_time_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cpu_cores": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "memory_mb": {
+          "type": "integer",
+          "minimum": 128
+        },
+        "disk_mb": {
+          "type": "integer",
+          "minimum": 128
+        },
+        "network_policy": {
+          "enum": [
+            "deny",
+            "allowlisted-readonly"
+          ]
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "null"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{2,127}$"
+    },
+    "roleIdentifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,63}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "nonEmptyStringArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "artifactReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_id",
+        "manifest_sha256",
+        "content_sha256",
+        "logical_path",
+        "mount_path",
+        "classification",
+        "content_kind",
+        "source_provenance_sha256s",
+        "real_task_derived"
+      ],
+      "properties": {
+        "artifact_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "content_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "logical_path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*$"
+        },
+        "mount_path": {
+          "type": "string",
+          "pattern": "^/inputs/[a-zA-Z0-9_./-]+$"
+        },
+        "classification": {
+          "enum": [
+            "public",
+            "internal",
+            "restricted",
+            "benchmark-hidden"
+          ]
+        },
+        "content_kind": {
+          "enum": [
+            "generic-core",
+            "abstract-defect",
+            "modification-admission",
+            "direct-user-governance",
+            "aggregate-regression",
+            "content-independent-verification",
+            "task-text",
+            "task-attachment",
+            "task-artifact",
+            "evaluation-rubric",
+            "raw-review",
+            "score",
+            "critique",
+            "reference-solution",
+            "test-failure",
+            "benchmark-secret"
+          ]
+        },
+        "source_provenance_sha256s": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/sha256"
+          }
+        },
+        "real_task_derived": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

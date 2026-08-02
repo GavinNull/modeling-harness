@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:modeling-harness:schema:revision-decision:1.0.0",
+  "title": "RevisionDecision",
+  "description": "Task-bound control-plane authorization for revising only the current answer artifact; real-task-derived taint is retained.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "packet_id",
+    "decision_id",
+    "purpose",
+    "task_id",
+    "run_id",
+    "prior_attempt_id",
+    "target_role_id",
+    "earliest_impact",
+    "source_review_packet_ids",
+    "source_review_hashes",
+    "real_task_derived",
+    "allowed_destination",
+    "forbidden_destinations",
+    "approved_by",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "packet_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "decision_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "purpose": {
+      "const": "current-answer-artifact-revision"
+    },
+    "task_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "run_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "prior_attempt_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "target_role_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,63}$"
+    },
+    "earliest_impact": {
+      "enum": [
+        "definition",
+        "understanding",
+        "creation",
+        "validation"
+      ]
+    },
+    "source_review_packet_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/identifier"
+      }
+    },
+    "source_review_hashes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/sha256"
+      }
+    },
+    "real_task_derived": {
+      "const": true
+    },
+    "allowed_destination": {
+      "const": "current-task-answer-artifacts-only"
+    },
+    "forbidden_destinations": {
+      "type": "array",
+      "uniqueItems": true,
+      "allOf": [
+        {
+          "contains": {
+            "const": "identity"
+          }
+        },
+        {
+          "contains": {
+            "const": "capability"
+          }
+        },
+        {
+          "contains": {
+            "const": "system-prompt"
+          }
+        },
+        {
+          "contains": {
+            "const": "routing"
+          }
+        },
+        {
+          "contains": {
+            "const": "shared-implementation"
+          }
+        },
+        {
+          "contains": {
+            "const": "tool-policy"
+          }
+        },
+        {
+          "contains": {
+            "const": "generic-template"
+          }
+        }
+      ],
+      "items": {
+        "enum": [
+          "identity",
+          "capability",
+          "system-prompt",
+          "routing",
+          "shared-implementation",
+          "tool-policy",
+          "generic-template"
+        ]
+      }
+    },
+    "approved_by": {
+      "const": "main_agent"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{2,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

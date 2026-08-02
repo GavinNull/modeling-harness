@@ -1,0 +1,10 @@
+ARG PYTHON_BASE_IMAGE=python:3.12-slim
+FROM ${PYTHON_BASE_IMAGE}
+
+RUN useradd --system --uid 65532 --create-home agent
+COPY examples/agent_entrypoint.py /opt/agent/agent_entrypoint.py
+RUN chmod 0555 /opt/agent/agent_entrypoint.py
+
+USER 65532:65532
+WORKDIR /workspace
+ENTRYPOINT ["python", "/opt/agent/agent_entrypoint.py"]

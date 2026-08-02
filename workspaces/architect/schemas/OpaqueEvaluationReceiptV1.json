@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://modeling-harness.invalid/schemas/OpaqueEvaluationReceiptV1.json",
+  "title": "OpaqueEvaluationReceiptV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "agent_id", "package_version", "candidate_sha256",
+    "verification_plan_sha256", "opaque_receipt_sha256", "decision"
+  ],
+  "properties": {
+    "schema_version": {"const": "release-gate.opaque-receipt.v1"},
+    "agent_id": {"const": "generic-agent-v2.5"},
+    "package_version": {"const": "2.5.0"},
+    "candidate_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "verification_plan_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "opaque_receipt_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "decision": {"enum": ["PASS", "REJECT"]}
+  }
+}

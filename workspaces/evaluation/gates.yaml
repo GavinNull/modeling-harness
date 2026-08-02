@@ -1,0 +1,194 @@
+schema_version: "2.5"
+gate_set_name: general_modeling_agent_release_gates
+agent_version: generic-agent-v2.5
+language: zh-CN
+
+decision_order:
+  - benchmark_validity
+  - integrity_and_isolation
+  - task_level_hard_gates
+  - quality_thresholds
+  - generalization_and_non_regression
+  - operational_constraints
+
+status_values: [pass, fail, insufficient_evidence, not_applicable]
+default_rule: "fail 或 insufficient_evidence 均阻止发布；not_applicable 必须由基准验证者预先批准。"
+
+benchmark_validity_gates:
+  - id: BV-01
+    name: 任务规范有效
+    rule: "任务目标、输入、约束和交付要求足以支持公平作答，无未披露的关键要求。"
+    required_evidence: [independent_specification_review]
+  - id: BV-02
+    name: 数据与参考验证自洽
+    rule: "输入数据、参考计算和评分条件通过独立核验。"
+    required_evidence: [data_validation_log, reference_validation_log]
+  - id: BV-03
+    name: 评分标准不过窄或过宽
+    rule: "评分能接受合理等价方案，同时能拒绝捷径、无效或不完整方案。"
+    required_evidence: [grader_adversarial_tests, alternative_solution_checks]
+  - id: BV-04
+    name: 环境可评
+    rule: "基准环境能够稳定创建并执行，不因无关依赖或平台差异产生系统性假失败。"
+    required_evidence: [benchmark_environment_smoke_test]
+
+hard_gates:
+  - id: HG-01
+    name: 任务覆盖
+    severity_on_fail: P1
+    rule: "全部原子化交付要求均被映射到输出、实现或明确且被接受的不可完成说明；关键要求不得遗漏。"
+    required_evidence: [coverage_matrix]
+  - id: HG-02
+    name: 硬约束满足
+    severity_on_fail: P1
+    rule: "所有硬约束、边界条件、守恒或取值域检查通过。"
+    required_evidence: [constraint_check_report, residual_report]
+  - id: HG-03
+    name: 关键主张可追溯
+    severity_on_fail: P1
+    rule: "100% 关键主张能够追溯到数据、代码、推导、假设及原始证据中的适用项。"
+    required_evidence: [claim_evidence_matrix]
+  - id: HG-04
+    name: 独立复算
+    severity_on_fail: P1
+    rule: "关键数值和结论由独立路径或独立评审者复算，结果在预先定义容差内一致。"
+    required_evidence: [independent_recalculation]
+  - id: HG-05
+    name: 干净环境复现
+    severity_on_fail: P1
+    rule: "只使用批准的只读输入和交付包，可在新建容器中通过声明入口重建全部关键结果工件。"
+    required_evidence: [clean_room_log, environment_manifest, artifact_hash_manifest]
+  - id: HG-06
+    name: 数据与结果诚信
+    severity_on_fail: P0
+    rule: "不存在伪造数据、伪造来源、未标记的虚构结果或隐瞒失败运行。"
+    required_evidence: [provenance_audit, run_ledger]
+  - id: HG-07
+    name: 工件一致性
+    severity_on_fail: P1
+    rule: "报告中的关键数字、表、图与批准代码输出及数据版本一致。"
+    required_evidence: [artifact_consistency_check]
+  - id: HG-08
+    name: 隔离与最小权限
+    severity_on_fail: P0
+    rule: "作者、评审和不同 Agent 的可写工作区隔离；原始输入只读；无未授权网络、跨区读取或状态继承。"
+    required_evidence: [isolation_attestation, access_log]
+  - id: HG-09
+    name: 隐藏集保密
+    severity_on_fail: P0
+    rule: "隐藏任务、变体、评分器和参考工件未进入构建上下文；canary 与访问审计无泄漏证据。"
+    required_evidence: [benchmark_access_audit, canary_scan]
+  - id: HG-10
+    name: 无题目特化
+    severity_on_fail: P0
+    rule: "提示词、代码、工具、路由和知识包不含题目身份、专属参数、答案、评分器细节或任务专用条件分支。"
+    required_evidence: [specialization_audit, change_review]
+  - id: HG-11
+    name: 局限性与不确定性披露
+    severity_on_fail: P1
+    rule: "所有可能改变核心结论的关键假设、不确定性、失败条件和外推限制均被披露。"
+    required_evidence: [uncertainty_register, limitation_register]
+  - id: HG-12
+    name: 运行记录完整
+    severity_on_fail: P1
+    rule: "所有正式运行、失败、重试、模型与工具版本、种子、预算和工件哈希均在账本中。"
+    required_evidence: [run_ledger, end_to_end_trace]
+
+quality_thresholds:
+  internal_total_score_min: 85
+  each_phase_percentage_min: 70
+  interpretation: "仅为内部候选发布门槛，不对应外部成绩。"
+
+generalization_release_gates:
+  primary_score:
+    composition:
+      hidden_variants: 0.45
+      private_novel_tasks: 0.55
+      public_historical_tasks: 0.00
+    candidate_median_min: 85
+  baseline_non_inferiority:
+    method: stratified_paired_bootstrap
+    confidence_level: 0.95
+    resamples_min: 10000
+    overall_delta_lower_bound_min_points: -1.0
+    family_delta_lower_bound_min_points: -3.0
+  stability:
+    minimum_runs_per_private_instance: 5
+    hard_gate_run_pass_rate_min: 0.90
+    p10_quality_score_min: 75
+    catastrophic_failure_rate_max: 0.00
+  coverage:
+    independent_task_families_min: 4
+    private_novel_task_families_min: 3
+    evidence_shortfall_status: insufficient_evidence
+  lockbox:
+    disjoint_panels_required: 2
+    consecutive_panel_passes_required: 2
+    same_panel_reuse_for_claim_forbidden: true
+
+operational_constraints:
+  policy: "由项目预算文件提供绝对上限；缺失预算时不得声称效率达标。"
+  relative_to_baseline:
+    median_cost_increase_without_quality_gain_max: 0.10
+    p95_latency_increase_without_quality_gain_max: 0.10
+    human_intervention_increase_without_quality_gain_max: 0.10
+  quality_gain_min_points_for_budget_tradeoff: 1.0
+  hard_budget_overrun_policy: fail
+
+modification_admission_gates:
+  - id: MA-01
+    rule: "DTP 动机来自可信来源、任务无关的独立一般研究，并映射到 capability_taxonomy.yaml 的固定通用能力。"
+  - id: MA-02
+    rule: "任何真实或合成任务、评测、评审、失败及其去标识、抽象、聚合或跨任务衍生均未直接或间接触发、证明或作为 DTP、MAP、研究请求或 Agent 本体修改动机。"
+  - id: MA-03
+    rule: "已提出可证伪的通用改进假设、影响面和回滚点。"
+  - id: MA-04
+    rule: "构建者收到的内容不含题目身份、专属参数、答案或评分器实现细节。"
+  - id: MA-05
+    rule: "修改后计划包含跨领域回归与至少一个未见任务。"
+  - id: MA-06
+    rule: "原始审计证据仅用于评估、发布通过或拒绝、回滚、报告，或通过 task-bound RevisionDecision 修订当前答案；不得进入 Agent 本体准入。"
+  - id: MA-07
+    rule: "proposal 阶段 MAPV1 与独立一般研究来源的 DTPV1 哈希绑定，并通过来源、非衍生及反特化校验。"
+  - id: MA-08
+    rule: "merge 后评测仅生成 opaque pass/reject release receipt；跨领域与 held-out 细节不得成为 MAPV1、merge 或后续 Agent 本体构建来源。"
+  - id: MA-09
+    rule: "单一任务失败只授权当前答案工件修订，不授权修改 Agent 身份、能力、系统提示词、路由或共享实现。"
+  - id: MA-10
+    rule: "Agent 本体构建输入不含真实题面、附件、评分、讲评、优秀解、原始 ReviewPacket 或测试失败细节。"
+  - id: MA-11
+    rule: "所有真实或合成任务及其附件、评分、讲评、答案、评审、测试失败与全部衍生永远只用于评估、当前答案 RevisionDecision、发布通过或拒绝、回滚或报告；绝不成为 Agent 本体修改证据。预注册内容无关测试仅验证已获授权的修改；本体动机只允许经独立审查的直接用户治理要求或任务无关独立一般研究。"
+
+stop_conditions:
+  - id: ST-01
+    rule: "连续三轮主要泛化分提升低于 1.0 分，且中位成本相对冻结基线上升超过 10%。"
+    action: freeze_and_architecture_review
+  - id: ST-02
+    rule: "同一通用能力缺陷经过三次已批准修改仍复发。"
+    action: freeze_and_root_cause_review
+  - id: ST-03
+    rule: "提升只在单一任务族出现，且跨领域或未见任务达到回滚阈值。"
+    action: rollback
+  - id: ST-04
+    rule: "锁箱查询或反馈预算耗尽。"
+    action: freeze_or_rotate_untouched_reserve
+  - id: ST-05
+    rule: "基准规范、数据、评分器或环境被证明不可信。"
+    action: quarantine_benchmark_and_recompute_claims
+
+rollback_conditions:
+  - id: RB-01
+    trigger: "任一新 hard gate 失败。"
+  - id: RB-02
+    trigger: "发现泄漏、题目特化、伪造、跨工作区越权或未授权状态继承。"
+  - id: RB-03
+    trigger: "整体配对差值置信区间下界低于 -1.0 分。"
+  - id: RB-04
+    trigger: "任一任务族配对差值置信区间下界低于 -3.0 分。"
+  - id: RB-05
+    trigger: "干净环境复现失败或关键工件哈希错配。"
+  - id: RB-06
+    trigger: "绝对资源硬预算越界且未预先批准。"
+  - id: RB-07
+    trigger: "灾难性失败率大于 0。"
+action: "回滚到最近同时通过全部门槛和私有面板的已验证版本，并封存触发证据。"

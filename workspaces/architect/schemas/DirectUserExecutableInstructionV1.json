@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://modeling-harness.invalid/schemas/DirectUserExecutableInstructionV1.json",
+  "title": "DirectUserExecutableInstructionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "instruction",
+    "governance_document_sha256",
+    "instruction_sha256",
+    "independent_review_sha256",
+    "agent_id",
+    "package_version"
+  ],
+  "properties": {
+    "schema_version": {"const": "agent-body.direct-user.v1"},
+    "instruction": {"const": "APPLY_REVIEWED_GENERIC_GOVERNANCE_CHANGE"},
+    "governance_document_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "instruction_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "independent_review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "agent_id": {"const": "generic-agent-v2.5"},
+    "package_version": {"const": "2.5.0"}
+  }
+}

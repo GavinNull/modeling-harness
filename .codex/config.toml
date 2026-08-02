@@ -1,0 +1,4 @@
+# Project-scoped Codex control plane. The controller retains one slot while
+# at most three independent role sessions run concurrently.
+[agents]
+max_concurrent_threads_per_session = 3

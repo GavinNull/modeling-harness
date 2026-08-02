@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://modeling-harness.invalid/schemas/MAPV1.json",
+  "title": "MAPV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "agent_id", "package_version",
+    "research_manifest_sha256", "independent_review_sha256",
+    "capability", "change_class", "impact", "rollback",
+    "verification_plan", "stage", "purpose", "dtp_sha256", "map_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "agent-body.map.v1"},
+    "agent_id": {"const": "generic-agent-v2.5"},
+    "package_version": {"const": "2.5.0"},
+    "research_manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "independent_review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "capability": {"enum": ["DEFINITION", "UNDERSTANDING", "CREATION", "VALIDATION", "RUNTIME_ORCHESTRATION"]},
+    "change_class": {"enum": ["CONTROL_SCHEMA", "ROLE_PERMISSION", "STATE_TRANSITION", "RUNTIME_ENFORCEMENT", "PROMPT_PROJECTION", "GENERIC_CAPABILITY"]},
+    "impact": {"enum": ["CONTROL_PLANE", "AGENT_BODY"]},
+    "rollback": {"const": "RESTORE_PARENT_AGENT_BODY"},
+    "verification_plan": {"const": "PREREGISTERED_CONTENT_INDEPENDENT"},
+    "stage": {"enum": ["PROPOSAL", "MERGE"]},
+    "purpose": {"const": "AGENT_BODY_CHANGE"},
+    "dtp_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "map_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

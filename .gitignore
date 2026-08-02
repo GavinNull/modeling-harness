@@ -1,0 +1,38 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+
+# Ephemeral execution workspaces and local attestations.
+.runtime/
+runs/
+runtime-workspaces/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Local editor and OS files.
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Public-release boundary: evaluation inputs, private diagnostics, and generated
+# work products are never source-distribution material.  The complete benchmark
+# tree and tests remain local evaluation assets; this repository distributes the
+# frozen Agent runtime, prompts, configuration, documentation, and containers.
+.agent_deps/
+.tmp/
+output/
+research/
+benchmarks/
+pilot_runs/
+tests/

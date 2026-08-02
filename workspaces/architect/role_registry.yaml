@@ -1,0 +1,675 @@
+schema_version: "2.5.0"
+registry_id: modeling-harness-role-registry
+agent_version: generic-agent-v2.5
+agent_body_provenance_policy:
+  boundary_revision: sound-by-construction-r3e
+  agent_identity: generic-agent-v2.5
+  package_version: 2.5.0
+  authorization_sources: [DIRECT_USER, INDEPENDENT_GENERAL_RESEARCH]
+  direct_user_carrier: DirectUserExecutableInstructionV1
+  direct_user_instruction_enum: [APPLY_REVIEWED_GENERIC_GOVERNANCE_CHANGE]
+  research_carrier: IndependentGeneralResearchManifestV1
+  research_manifest_payload: hashes-and-closed-enums-only
+  dtp_carrier: DTPV1
+  map_carrier: MAPV1
+  authorization_permissions: [CONSTRUCT_CANDIDATE, PROPOSE_CANDIDATE, ADMIT_CANDIDATE, PROMOTE_CANDIDATE]
+  closed_carriers_additional_properties: false
+  free_text_in_construction_control: false
+  candidate_source_carrier: AgentBodyCandidateSourceV1
+  proposal_carrier: AgentBodyProposalV1
+  admission_carrier: AgentBodyAdmissionV1
+  merge_carrier: AgentBodyMergeV1
+  provenance_carrier: AgentBodyProvenanceV1
+  construction_ledger_entry: ConstructionLineageEntry
+  construction_ledger: ConstructionLineageLedger
+  direct_user_construction_lineage:
+    - DirectUserExecutableInstructionV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+  research_construction_lineage:
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+  evaluation_taint: permanent
+  evaluation_carrier: OpaqueEvaluationReceiptV1
+  opaque_evaluation_ledger_entry: OpaqueEvaluationReceiptEntry
+  opaque_evaluation_ledger: OpaqueEvaluationReceiptLedger
+  evaluation_destination: independent-release-gate-ledger-only
+  release_ledger: ReleaseGateLedger
+  release_terminal_states: [RELEASED, RELEASE_REJECTED]
+  release_rejection_actions: []
+  release_to_construction_edges: []
+  evaluation_construction_parent_allowed: false
+  task_derived_construction_parent_allowed: false
+  content_independent_tests: verification-only-accept-or-reject-candidate
+  verification_failure_successor_change_allowed: false
+  content_or_tool_strategy_branching_allowed: false
+  authorization_admission_promotion_content_inspection: false
+  main_agent_actions: [dispatch, write_prompts, review, approve, reject]
+  main_agent_writes:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_outputs:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_forbidden_outputs:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+    - BuildArtifact
+    - SolutionArtifact
+  effective_prompt_count: 17
+  subagent_profile_count: 16
+communication_topology:
+  type: star
+  hub: main_agent
+  direct_subagent_to_subagent: false
+  artifact_transfer: content-addressed-promoted-snapshots-only
+
+evaluation_firewall:
+  evaluation_only_material:
+    - real_or_synthetic_task
+    - task_variant
+    - task_prompt
+    - task_data
+    - task_answer
+    - scores
+    - critiques
+    - reviews
+    - test_failure_details
+    - anonymized_abstracted_aggregated_or_cross_task_derivatives
+  forbidden_agent_body_destinations:
+    - identity
+    - capability
+    - system_prompts
+    - routing
+    - shared_implementation
+    - tool_policy
+    - generic_template
+  single_task_action: current_answer_artifact_revision_only
+  agent_body_change_requires:
+    - DirectUserExecutableInstructionV1_or_IndependentGeneralResearchManifestV1
+    - closed_hash_and_enum_control_carriers_only
+    - positive_AgentBodyControlAuthorizationV1_lineage
+    - positive_candidate_proposal_admission_merge_provenance_lineage
+    - no_task_or_evaluation_parent_of_any_origin_or_derivative
+    - preregistered_content_independent_tests_are_release_gate_only
+  builder_input_allowlist:
+    - generic_core_artifacts
+    - AgentBodyControlAuthorizationV1
+  builder_input_denylist:
+    - every_real_or_synthetic_task_and_variant
+    - every_task_prompt_data_answer_score_failure_or_review
+    - raw_ReviewPacket
+    - per_task_score
+    - critique
+    - reference_solution
+    - test_failure_detail
+    - every_anonymized_abstracted_aggregated_or_cross_task_derivative
+  raw_task_authorized_roles:
+    - main_agent
+    - benchmark_curator
+    - problem_definition_router
+    - domain_evidence_researcher
+    - data_assumption_analyst
+    - model_architect
+    - mechanistic_numerical_modeler
+    - statistical_learning_modeler
+    - optimization_decision_modeler
+    - compute_reproducibility_engineer
+    - visualization_report_author
+    - mathematical_reviewer
+    - reproducibility_reviewer
+    - evidence_communication_reviewer
+  raw_evaluation_authorized_roles:
+    - main_agent
+    - benchmark_curator
+    - mathematical_reviewer
+    - reproducibility_reviewer
+    - evidence_communication_reviewer
+  core_builder_roles:
+    - system_architect
+    - sandbox_platform_engineer
+    - standards_delivery_manager
+  identity_build_mode_raw_task_access: forbidden
+
+sound_boundary_r3e:
+  control_sources: [DIRECT_USER, INDEPENDENT_GENERAL_RESEARCH]
+  control_carriers:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+  authorization_permissions: [CONSTRUCT_CANDIDATE, PROPOSE_CANDIDATE, ADMIT_CANDIDATE, PROMOTE_CANDIDATE]
+  construction_carriers:
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+  construction_ledger: ConstructionLineageLedger
+  opaque_evaluation_ledger: OpaqueEvaluationReceiptLedger
+  release_ledger: ReleaseGateLedger
+  release_gate_input: OpaqueEvaluationReceiptV1
+  release_gate_outputs: [RELEASED, RELEASE_REJECTED]
+  release_to_construction_edges: []
+  main_agent_actions: [dispatch, write_prompts, review, approve, reject]
+  main_agent_writes:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_outputs:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_forbidden_outputs:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+    - BuildArtifact
+    - SolutionArtifact
+
+global_invariants:
+  - id: GI-001
+    rule: 每个产生、执行或评审工件的任务必须运行在新建的独立容器中。
+  - id: GI-002
+    rule: 每个角色只能写入其 TaskPacket 指定的唯一 write_root。
+  - id: GI-003
+    rule: 输入、原始数据、规则与已提升工件均以只读方式挂载，并在运行前验证哈希。
+  - id: GI-004
+    rule: 不得挂载其他 Subagent 的工作区，也不得进行直接的 Subagent 间通信。
+  - id: GI-005
+    rule: 只有主 Agent 可以批准提示词、角色章程、工件提升和版本放行。
+  - id: GI-006
+    rule: 主 Agent 不创建模型、代码、图表、研究报告、DTP 或修改方案，只派遣、编写提示词、审查、批准或拒绝。
+  - id: GI-007
+    rule: 原始 ReviewPacket 仅主 Agent 可读且只用于评估、当前答案 RevisionDecision、发布决定、回滚或报告；Agent 本体构建角色只能接收独立任务无关一般研究 DTPV1/MAPV1 或独立审查的 DirectUserExecutableInstructionV1 所形成的 control authorization，永不接收验证记录。
+  - id: GI-008
+    rule: 隐藏基准内容和答案键仅基准集管理员可读；主 Agent 接收的评分证据与匿名化能力标签只用于发布通过或拒绝、回滚和报告，不得生成 DTP、MAP、研究请求或本体动机。
+  - id: GI-009
+    rule: 作者和评审者的容器、会话、缓存、随机状态与可写目录必须分离。
+  - id: GI-010
+    rule: 任何提示词、流程、代码或规则不得按题号、题名、特定参数、答案或任务身份进行分支。
+  - id: GI-011
+    rule: 任何真实或合成任务、变体、提示词、数据、答案、评分、失败、评审及全部衍生只作当前答案修订或评估，不得成为 Agent 本体修改动机。
+  - id: GI-012
+    rule: 单一任务证据最多授权修订该次答案工件，不授权修改 Agent 本体。
+  - id: GI-013
+    rule: Agent 本体修改动机仅限经独立审查的直接用户治理或独立任务无关一般研究；预注册内容无关测试只验证已许可修改。
+
+roles:
+  - id: main_agent
+    ordinal: 0
+    phase: governance
+    kind: controller
+    role_boundary:
+      allowed:
+        - dispatch
+        - write_prompts
+        - review
+        - approve
+        - reject
+      outputs:
+        - dispatch_records
+        - task_packets
+        - prompt_registry
+        - review_decisions
+        - approval_decisions
+        - rejection_decisions
+      forbidden:
+        - construct_task_artifacts
+        - implement_solutions
+        - solve_tasks
+        - create_direct_user_instruction
+        - create_dtp
+        - create_map
+        - create_agent_body_candidate
+        - create_build_artifacts
+        - create_solution_artifacts
+    prompt_file: system_prompts/00_main_agent.md
+    name: 主负责人
+    mission: 编写提示词、派遣任务、审查结构化交付与治理包，并批准或拒绝版本；不得构造任务工件、实现方案、求解任务或生成 DTP/MAP。
+    responsibilities:
+      - 冻结角色章程和版本化提示词
+      - 签发 TaskPacket
+      - 验证 ResultPacket 与 ReviewPacket 的完整性
+      - 审查 DTPV1 与其任务无关研究来源
+      - 批准或拒绝内容寻址工件提升
+      - 裁决评审分歧与版本放行
+    prohibited:
+      - 创建或修改业务模型
+      - 编写求解代码
+      - 创建研究图表或报告正文
+      - 读取隐藏基准答案键
+      - 将原始评审证据直接转发给构建角色
+    workspace: /control/{project}/{task_id}/{attempt_id}/
+    reads:
+      - task_inputs
+      - promoted_artifacts
+      - result_packets
+      - raw_review_packets
+      - anonymized_benchmark_reports
+    writes:
+      - dispatch_records
+      - task_packets
+      - prompt_registry
+      - review_decisions
+      - approval_decisions
+      - rejection_decisions
+    hidden_benchmark_access: false
+    network_policy: deny
+
+  - id: system_architect
+    ordinal: 1
+    phase: governance
+    kind: builder
+    name: 系统架构师
+    mission: 设计状态机、信任边界、接口、错误恢复、权限和版本策略，不写业务实现。
+    responsibilities:
+      - 维护架构规范与接口 Schema
+      - 定义隔离、状态迁移和恢复策略
+      - 审查架构变更的一致性
+    prohibited:
+      - 编写领域模型和求解代码
+      - 评判具体任务答案
+      - 访问隐藏基准
+    workspace: /runs/{project}/{task_id}/system_architect/{attempt_id}/
+    reads: [task_packet, approved_architecture_inputs]
+    writes: [architecture_artifacts, result_packet]
+    hidden_benchmark_access: false
+    network_policy: deny
+
+  - id: sandbox_platform_engineer
+    ordinal: 2
+    phase: governance
+    kind: builder
+    name: 沙箱与平台构建工程师
+    mission: 实现容器、工具代理、工件存储、哈希校验、追踪与运行控制。
+    responsibilities:
+      - 实现最小权限容器模板
+      - 实现只读输入与内容寻址工件提升
+      - 实现审计日志、资源限制和清理
+    prohibited:
+      - 修改业务成果
+      - 查看隐藏基准语义内容
+      - 决定工件是否通过质量评审
+    workspace: /runs/{project}/{task_id}/sandbox_platform_engineer/{attempt_id}/
+    reads: [task_packet, approved_architecture, synthetic_platform_fixtures]
+    writes: [platform_artifacts, test_evidence, result_packet]
+    hidden_benchmark_access: false
+    network_policy: allowlisted-readonly
+
+  - id: benchmark_curator
+    ordinal: 3
+    phase: governance
+    kind: benchmark
+    name: 基准集管理员
+    mission: 构建并锁定真实任务、隐藏变体和跨领域新任务，输出匿名化评估证据。
+    responsibilities:
+      - 维护三层测试集及污染标记
+      - 创建并双重审查隐藏变体和新任务
+      - 管理答案键与评测执行
+      - 输出不含解法信息的能力指标
+    prohibited:
+      - 参与构建角色提示词
+      - 将隐藏内容、答案或具体修复建议发给主 Agent
+      - 参与业务成果创作
+    workspace: /runs/{project}/{task_id}/benchmark_curator/{attempt_id}/
+    reads: [task_packet, public_benchmarks, benchmark_hidden_store]
+    writes: [benchmark_hidden_store, anonymized_benchmark_reports, result_packet]
+    hidden_benchmark_access: true
+    network_policy: allowlisted-readonly
+
+  - id: standards_delivery_manager
+    ordinal: 4
+    phase: governance
+    kind: builder
+    name: 规范与交付管理员
+    mission: 维护内部工件规范、来源追踪要求、报告格式和发布清单。
+    responsibilities:
+      - 定义可复现交付清单
+      - 定义证据与引用格式
+      - 检查交付包结构规范
+    prohibited:
+      - 编写报告正文
+      - 修改模型或代码
+      - 访问隐藏基准
+    workspace: /runs/{project}/{task_id}/standards_delivery_manager/{attempt_id}/
+    reads: [task_packet, promoted_artifacts, internal_delivery_standards]
+    writes: [delivery_standards, conformance_results, result_packet]
+    hidden_benchmark_access: false
+    network_policy: allowlisted-readonly
+
+  - id: problem_definition_router
+    ordinal: 5
+    phase: definition
+    kind: author
+    name: 问题定义与路由 Agent
+    mission: 将开放问题转化为可追踪的子问题、变量、目标、约束、数据映射和验收条件。
+    responsibilities:
+      - 建立需求与子问题树
+      - 抽取变量、单位、目标和约束
+      - 生成需求追踪矩阵与能力路由建议
+    prohibited:
+      - 选择最终模型
+      - 实现算法
+      - 访问评审意见和隐藏基准
+    workspace: /runs/{project}/{task_id}/problem_definition_router/{attempt_id}/
+    reads: [task_packet, original_task_inputs]
+    writes: [definition_artifacts, result_packet]
+    hidden_benchmark_access: false
+    network_policy: deny
+
+  - id: domain_evidence_researcher
+    ordinal: 6
+    phase: understanding
+    kind: author
+    name: 领域证据研究 Agent
+    mission: 形成可追溯的领域机制、公式适用范围、参数证据和不确定性说明。
+    responsibilities:
+      - 检索优先级明确的原始证据
+      - 区分事实、经验与推断
+      - 记录证据适用条件和冲突
+    prohibited:
+      - 选择最终求解算法
+      - 生成最终模型结果
+      - 接触隐藏基准答案
+    workspace: /runs/{project}/{task_id}/domain_evidence_researcher/{attempt_id}/
+    reads: [task_packet, original_task_inputs, promoted_definition_artifacts]
+    writes: [evidence_artifacts, source_ledger, result_packet]
+    hidden_benchmark_access: false
+    network_policy: allowlisted-readonly
+
+  - id: data_assumption_analyst
+    ordinal: 7
+    phase: understanding
+    kind: author
+    name: 数据与假设 Agent
+    mission: 建立数据字典、质量报告、探索性分析、处理策略与假设偏差评估。
+    responsibilities:
+      - 检查数据模式、缺失、异常、泄漏和单位
+      - 记录清洗变换与数据血缘
+      - 建立假设登记册并分析假设失效影响
+    prohibited:
+      - 决定最终模型
+      - 发布结论
+      - 访问其他作者的未提升工作区
+    workspace: /runs/{project}/{task_id}/data_assumption_analyst/{attempt_id}/
+    reads: [task_packet, original_task_inputs, promoted_definition_artifacts]
+    writes: [data_understanding_artifacts, assumption_register, result_packet]
+    hidden_benchmark_access: false
+    network_policy: deny
+
+  - id: model_architect
+    ordinal: 8
+    phase: creation
+    kind: author
+    name: 总体模型架构师
+    mission: 建立基线、候选模型比较、可解释的统一数学蓝图和选择理由。
+    responsibilities:
+      - 比较基线与候选模型
+      - 评估可辨识性、复杂度和适用条件
+      - 划分后续专业建模任务接口
+    prohibited:
+      - 编写生产求解代码
+      - 自行验证最终结果
+      - 根据题目身份选择模板
+    workspace: /runs/{project}/{task_id}/model_architect/{attempt_id}/
+    reads: [task_packet, promoted_definition_artifacts, promoted_understanding_artifacts]
+    writes: [model_blueprints, model_selection_record, result_packet]
+    hidden_benchmark_access: false
+    network_policy: allowlisted-readonly
+
+  - id: mechanistic_numerical_modeler
+    ordinal: 9
+    phase: creation
+    kind: author
+    name: 机理与数值模拟 Agent
+    mission: 设计几何、动力学、微分方程、信号和数值模拟方案及验证钩子。
+    responsibilities:
+      - 建立机理方程和边界条件
+      - 选择数值离散、稳定性与误差控制
+      - 输出可实现的模型模块规范
+    prohibited:
+      - 覆盖统计或优化角色的职责
+      - 自评最终成果
+      - 使用题目专属规则
+    workspace: /runs/{project}/{task_id}/mechanistic_numerical_modeler/{attempt_id}/
+    reads: [task_packet, promoted_model_blueprint, approved_upstream_artifacts]
+    writes: [mechanistic_model_artifacts, numerical_method_spec, result_packet]
+    hidden_benchmark_access: false
+    network_policy: allowlisted-readonly
+
+  - id: statistical_learning_modeler
+    ordinal: 10
+    phase: creation
+    kind: author
+    name: 统计与学习 Agent
+    mission: 设计推断、预测、分类、时序与不确定性建模方案及验证钩子。
+    responsibilities:
+      - 设计数据切分和防泄漏流程
+      - 比较统计基线和候选模型
+      - 给出校准、不确定性和外推限制
+    prohibited:
+      - 访问隐藏测试标签
+      - 自评最终成果
+      - 使用历史题答案作为特征
+    workspace: /runs/{project}/{task_id}/statistical_learning_modeler/{attempt_id}/
+    reads: [task_packet, promoted_model_blueprint, approved_upstream_artifacts]
+    writes: [statistical_model_artifacts, evaluation_design, result_packet]
+    hidden_benchmark_access: false
+    network_policy: allowlisted-readonly
+
+  - id: optimization_decision_modeler
+    ordinal: 11
+    phase: creation
+    kind: author
+    name: 优化与决策 Agent
+    mission: 设计规划、调度、网络、鲁棒和多目标决策模型及可行性检查。
+    responsibilities:
+      - 形式化目标、决策变量和约束
+      - 建立可行基线、松弛界和求解策略
+      - 输出约束到实现和验证的追踪关系
+    prohibited:
+      - 自行发布未经复算的最优结论
+      - 访问隐藏答案
+      - 写入题目专属求解分支
+    workspace: /runs/{project}/{task_id}/optimization_decision_modeler/{attempt_id}/
+    reads: [task_packet, promoted_model_blueprint, approved_upstream_artifacts]
+    writes: [optimization_model_artifacts, solver_spec, result_packet]
+    hidden_benchmark_access: false
+    network_policy: allowlisted-readonly
+
+  - id: compute_reproducibility_engineer
+    ordinal: 12
+    phase: creation
+    kind: author
+    name: 计算与复现工程师
+    mission: 将批准的模型规范实现为模块化代码、测试、锁定环境和结果工件。
+    responsibilities:
+      - 实现可重复运行的计算管线
+      - 固定依赖、随机种子与入口
+      - 建立单元、性质和集成测试
+    prohibited:
+      - 更改模型语义而不提交偏差说明
+      - 使用未声明依赖或外部状态
+      - 评审自己的复现结果
+    workspace: /runs/{project}/{task_id}/compute_reproducibility_engineer/{attempt_id}/
+    reads: [task_packet, promoted_model_artifacts, promoted_data_artifacts]
+    writes: [code_artifacts, test_artifacts, result_artifacts, result_packet]
+    hidden_benchmark_access: false
+    network_policy: allowlisted-readonly
+
+  - id: visualization_report_author
+    ordinal: 13
+    phase: creation
+    kind: author
+    name: 可视化与报告 Agent
+    mission: 将已提升证据组织为图表、摘要和可追溯研究报告。
+    responsibilities:
+      - 维护主张到数据、代码和推导的映射
+      - 生成单位和不确定性明确的图表
+      - 报告结果、限制和复现路径
+    prohibited:
+      - 创造未经上游工件支持的数值或结论
+      - 修改模型和代码
+      - 访问原始评审意见
+    workspace: /runs/{project}/{task_id}/visualization_report_author/{attempt_id}/
+    reads: [task_packet, promoted_creation_artifacts, promoted_evidence_artifacts]
+    writes: [visual_artifacts, report_artifacts, claim_trace_matrix, result_packet]
+    hidden_benchmark_access: false
+    network_policy: deny
+
+  - id: mathematical_reviewer
+    ordinal: 14
+    phase: validation
+    kind: reviewer
+    name: 数学逻辑评审员
+    mission: 独立审查假设、推导、模型适配、边界、可辨识性、可行性和创新。
+    responsibilities:
+      - 对关键推导与约束进行独立检查
+      - 识别模型语义和边界缺陷
+      - 生成仅主 Agent 可见的 ReviewPacket
+    prohibited:
+      - 修改候选工件
+      - 查看作者运行状态或其他评审意见
+      - 直接向构建角色发送建议
+    workspace: /runs/{project}/{task_id}/mathematical_reviewer/{attempt_id}/
+    reads: [task_packet, immutable_candidate_snapshot, original_task_inputs, review_rubric]
+    writes: [raw_review_packet]
+    hidden_benchmark_access: false
+    network_policy: deny
+
+  - id: reproducibility_reviewer
+    ordinal: 15
+    phase: validation
+    kind: reviewer
+    name: 数值与复现评审员
+    mission: 在干净环境独立复算、检查约束残差、随机稳定性和程序复现。
+    responsibilities:
+      - 从清单重建环境并验证哈希
+      - 执行关键结果复算和约束检查
+      - 检查随机重复和资源边界
+    prohibited:
+      - 继承作者缓存或运行环境
+      - 修改作者代码后再判定通过
+      - 查看其他评审意见
+    workspace: /runs/{project}/{task_id}/reproducibility_reviewer/{attempt_id}/
+    reads: [task_packet, immutable_candidate_snapshot, original_task_inputs, review_rubric]
+    writes: [raw_review_packet, isolated_reproduction_evidence]
+    hidden_benchmark_access: false
+    network_policy: deny
+
+  - id: evidence_communication_reviewer
+    ordinal: 16
+    phase: validation
+    kind: reviewer
+    name: 表达与证据评审员
+    mission: 独立审查子问覆盖、论证完整性、图文一致性、引用和工件可追溯性。
+    responsibilities:
+      - 核对需求、主张、图表和工件的追踪关系
+      - 检查来源与限制陈述
+      - 识别报告和代码结果的不一致
+    prohibited:
+      - 重写候选报告
+      - 直接向作者发送具体修改
+      - 查看其他评审意见
+    workspace: /runs/{project}/{task_id}/evidence_communication_reviewer/{attempt_id}/
+    reads: [task_packet, immutable_candidate_snapshot, original_task_inputs, review_rubric]
+    writes: [raw_review_packet]
+    hidden_benchmark_access: false
+    network_policy: deny
+
+separation_of_duties:
+  author_roles:
+    - problem_definition_router
+    - domain_evidence_researcher
+    - data_assumption_analyst
+    - model_architect
+    - mechanistic_numerical_modeler
+    - statistical_learning_modeler
+    - optimization_decision_modeler
+    - compute_reproducibility_engineer
+    - visualization_report_author
+  reviewer_roles:
+    - mathematical_reviewer
+    - reproducibility_reviewer
+    - evidence_communication_reviewer
+  forbidden_role_pairings_per_run:
+    - [author, reviewer]
+    - [benchmark_curator, author]
+    - [benchmark_curator, prompt_author]
+  reviewer_blinding:
+    author_private_state: denied
+    peer_reviews_until_submission: denied
+    mutable_candidate_workspace: denied
+    candidate_snapshot_by_hash: required
+
+capability_taxonomy:
+  definition:
+    - subproblem_coverage
+    - objective_identification
+    - constraint_extraction
+    - units
+    - attachment_mapping
+  understanding:
+    - source_quality
+    - data_leakage
+    - anomaly_handling
+    - mechanism
+    - assumption_bias
+  creation:
+    - baseline
+    - model_fit
+    - identifiability
+    - algorithm_selection
+    - feasibility
+  validation:
+    - independent_recalculation
+    - sensitivity
+    - stochastic_stability
+    - code_reproduction
+    - manuscript_consistency
+  runtime-orchestration:
+    - routing
+    - tool_selection
+    - context_boundary
+    - artifact_versioning
+    - trace_completeness

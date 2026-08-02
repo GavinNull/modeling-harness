@@ -1,0 +1,633 @@
+schema_version: "2.5.0"
+machine_id: modeling-research-lifecycle
+agent_version: generic-agent-v2.5
+agent_body_provenance_policy:
+  boundary_revision: sound-by-construction-r3e
+  agent_identity: generic-agent-v2.5
+  package_version: 2.5.0
+  authorization_sources: [DIRECT_USER, INDEPENDENT_GENERAL_RESEARCH]
+  direct_user_carrier: DirectUserExecutableInstructionV1
+  direct_user_instruction_enum: [APPLY_REVIEWED_GENERIC_GOVERNANCE_CHANGE]
+  research_carrier: IndependentGeneralResearchManifestV1
+  research_manifest_payload: hashes-and-closed-enums-only
+  dtp_carrier: DTPV1
+  map_carrier: MAPV1
+  authorization_permissions: [CONSTRUCT_CANDIDATE, PROPOSE_CANDIDATE, ADMIT_CANDIDATE, PROMOTE_CANDIDATE]
+  closed_carriers_additional_properties: false
+  free_text_in_construction_control: false
+  candidate_source_carrier: AgentBodyCandidateSourceV1
+  proposal_carrier: AgentBodyProposalV1
+  admission_carrier: AgentBodyAdmissionV1
+  merge_carrier: AgentBodyMergeV1
+  provenance_carrier: AgentBodyProvenanceV1
+  construction_ledger_entry: ConstructionLineageEntry
+  construction_ledger: ConstructionLineageLedger
+  direct_user_construction_lineage:
+    - DirectUserExecutableInstructionV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+  research_construction_lineage:
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+  evaluation_taint: permanent
+  evaluation_carrier: OpaqueEvaluationReceiptV1
+  opaque_evaluation_ledger_entry: OpaqueEvaluationReceiptEntry
+  opaque_evaluation_ledger: OpaqueEvaluationReceiptLedger
+  evaluation_destination: independent-release-gate-ledger-only
+  release_ledger: ReleaseGateLedger
+  release_terminal_states: [RELEASED, RELEASE_REJECTED]
+  release_rejection_actions: []
+  release_to_construction_edges: []
+  evaluation_construction_parent_allowed: false
+  task_derived_construction_parent_allowed: false
+  content_independent_tests: verification-only-accept-or-reject-candidate
+  verification_failure_successor_change_allowed: false
+  content_or_tool_strategy_branching_allowed: false
+  authorization_admission_promotion_content_inspection: false
+  main_agent_actions: [dispatch, write_prompts, review, approve, reject]
+  main_agent_writes:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_outputs:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_forbidden_outputs:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+    - BuildArtifact
+    - SolutionArtifact
+  effective_prompt_count: 17
+  subagent_profile_count: 16
+sound_boundary_r3e:
+  control_sources: [DIRECT_USER, INDEPENDENT_GENERAL_RESEARCH]
+  control_carriers:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+  authorization_permissions: [CONSTRUCT_CANDIDATE, PROPOSE_CANDIDATE, ADMIT_CANDIDATE, PROMOTE_CANDIDATE]
+  construction_carriers:
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+  construction_ledger: ConstructionLineageLedger
+  opaque_evaluation_ledger: OpaqueEvaluationReceiptLedger
+  release_ledger: ReleaseGateLedger
+  release_gate_input: OpaqueEvaluationReceiptV1
+  release_gate_outputs: [RELEASED, RELEASE_REJECTED]
+  release_to_construction_edges: []
+  main_agent_actions: [dispatch, write_prompts, review, approve, reject]
+  main_agent_writes:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_outputs:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_forbidden_outputs:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+    - BuildArtifact
+    - SolutionArtifact
+
+initial_state: RECEIVED
+terminal_states:
+  - RELEASED
+  - RELEASE_REJECTED
+  - CANCELLED
+  - QUARANTINED
+
+invariants:
+  - state changes are append-only events; existing event records are never mutated
+  - only main_agent may authorize non-error forward transitions
+  - every forward transition records input and output manifest hashes
+  - an artifact is readable downstream only after hash verification and main_agent promotion
+  - reviewer states use newly created containers and immutable candidate snapshots
+  - raw ReviewPacket objects never cross into author workspaces
+  - current-answer revision requires a task-bound schema-valid RevisionDecision; DTP and MAP are Agent-body-only
+  - benchmark-hidden content never enters TaskPacket for non-benchmark roles
+  - release requires three independent review profiles and cross-domain regression
+  - recovery creates a new attempt_id; failed workspaces are sealed, not reused
+  - real task material, scores, critiques, reference solutions and test failures are evaluation-only and never enter Agent-body builders
+  - one task may authorize only a new attempt for that task's answer artifacts
+  - Agent-body construction accepts only the closed positive control and candidate lineage; evaluation is never a parent
+  - every real or synthetic task, variant, prompt, datum, answer, score, failure, review and every derivative is evaluation-only or current-answer-revision-only
+  - Agent-body motivation is limited to direct user governance or independent task-independent general research
+  - preregistered content-independent property and contract tests verify permitted changes only and never motivate them
+  - main_agent dispatches, writes prompts, reviews, approves or rejects; it never constructs task artifacts, implements solutions or solves tasks
+
+states:
+  RECEIVED:
+    description: 原始任务、数据和资源限制已进入隔离暂存区。
+    allowed_writers: [ingress_service]
+    required_artifacts: [raw_input_manifest]
+  INTAKE_VALIDATED:
+    description: 输入已完成恶意内容扫描、格式检查、分类和哈希固定。
+    allowed_writers: [main_agent]
+    required_artifacts: [validated_input_manifest, intake_report]
+  DEFINING:
+    description: 问题定义与路由角色正在建立需求追踪基线。
+    allowed_writers: [problem_definition_router]
+    required_artifacts: []
+  DEFINITION_REVIEW:
+    description: 主 Agent 审查定义工件的完整性、边界和可路由性。
+    allowed_writers: [main_agent]
+    required_artifacts: [definition_candidate_manifest]
+  UNDERSTANDING:
+    description: 领域证据与数据假设角色在相互隔离的容器内并行工作。
+    allowed_writers: [domain_evidence_researcher, data_assumption_analyst]
+    required_artifacts: [promoted_definition_manifest]
+  UNDERSTANDING_REVIEW:
+    description: 主 Agent 审查证据、数据质量、假设和来源血缘。
+    allowed_writers: [main_agent]
+    required_artifacts: [evidence_candidate_manifest, data_candidate_manifest]
+  MODEL_DESIGN:
+    description: 总体模型架构师比较基线与候选模型并形成数学蓝图。
+    allowed_writers: [model_architect]
+    required_artifacts: [promoted_definition_manifest, promoted_understanding_manifest]
+  SPECIALIST_CREATION:
+    description: 经路由选中的专业建模角色在隔离容器内产生模型模块。
+    allowed_writers:
+      - mechanistic_numerical_modeler
+      - statistical_learning_modeler
+      - optimization_decision_modeler
+    required_artifacts: [promoted_model_blueprint_manifest]
+  COMPUTE_IMPLEMENTATION:
+    description: 计算工程师按已批准语义实现代码、测试和结果。
+    allowed_writers: [compute_reproducibility_engineer]
+    required_artifacts: [promoted_specialist_manifest]
+  REPORT_ASSEMBLY:
+    description: 报告角色只基于已提升工件组织图表、主张和报告。
+    allowed_writers: [visualization_report_author]
+    required_artifacts: [promoted_compute_manifest, promoted_evidence_manifest]
+  CANDIDATE_REVIEW:
+    description: 主 Agent 检查候选清单完整性，冻结供评审的内容哈希。
+    allowed_writers: [main_agent]
+    required_artifacts: [candidate_manifest]
+  INDEPENDENT_VALIDATION:
+    description: 三类评审员在全新环境中盲审同一不可变候选快照。
+    allowed_writers:
+      - mathematical_reviewer
+      - reproducibility_reviewer
+      - evidence_communication_reviewer
+    required_artifacts: [immutable_candidate_manifest, reviewer_task_packets]
+  REVIEW_RECONCILIATION:
+    description: 主 Agent 验证评审独立性，处理分歧，并仅作通过、拒绝、发布回滚、报告或当前答案修订决定；评审不得产生 Agent 本体缺陷或研究请求。
+    allowed_writers: [main_agent]
+    required_artifacts: [three_review_packets]
+  CONTROL_AUTHORIZATION_REVIEW:
+    description: 仅审查由可信来源、任务无关独立一般研究提交的 Agent 本体 DTP；主 Agent 不构造 DTP，且任何任务、评测、评审或其衍生均不得进入此状态。
+    allowed_writers: [main_agent]
+    required_artifacts: [closed_control_authorization]
+  ANSWER_REVISION_DECISION:
+    description: Main-agent-only task-bound decision; real-task-derived taint is retained and destinations are limited to the current answer.
+    allowed_writers: [main_agent]
+    required_artifacts: [raw_review_packets]
+  REVISION_AUTHORIZED:
+    description: 仅授权当前任务答案工件的新尝试，不授权修改 Agent 身份、能力、系统提示词、路由或共享实现。
+    allowed_writers: [main_agent]
+    required_artifacts: [revision_decision]
+  RELEASE_CANDIDATE:
+    description: 三项独立评审硬门槛均通过，形成待回归版本。
+    allowed_writers: [main_agent]
+    required_artifacts: [review_approval_record, release_candidate_manifest]
+  REGRESSION_TESTING:
+    description: 基准管理员运行历史任务、隐藏变体、全新任务和稳定性回归。
+    allowed_writers: [benchmark_curator]
+    required_artifacts: [release_candidate_manifest, sealed_benchmark_plan]
+  RELEASE_REVIEW:
+    description: 主 Agent 只基于匿名化聚合证据进行多目标放行决策。
+    allowed_writers: [main_agent]
+    required_artifacts: [anonymized_benchmark_report, regression_report]
+  RELEASE_REJECTED:
+    description: 评测证据仅形成发布拒绝、回滚和报告；不得生成研究请求、DTP、MAP 或任何 Agent 本体修改动机。
+    allowed_writers: []
+    required_artifacts: [release_rejection_report, rollback_decision]
+  RELEASED:
+    description: 版本满足所有硬门槛且跨任务无显著退化，提示词和工件均已冻结。
+    allowed_writers: []
+    required_artifacts: [release_manifest, release_decision]
+  FAILED_RECOVERABLE:
+    description: 运行、格式、资源或可重试依赖失败；当前尝试被封存。
+    allowed_writers: [orchestrator]
+    required_artifacts: [failure_event]
+  QUARANTINED:
+    description: 发生越权、泄漏、哈希错配、题目特化或伪造，相关工件禁止提升。
+    allowed_writers: []
+    required_artifacts: [security_incident]
+  CANCELLED:
+    description: 用户取消或主 Agent 判定任务不再继续。
+    allowed_writers: []
+    required_artifacts: [cancellation_record]
+
+transitions:
+  - id: TR-001
+    from: RECEIVED
+    to: INTAKE_VALIDATED
+    actor: main_agent
+    event: intake.accepted
+    guards:
+      - input manifest hash verified
+      - inputs classified and mounted read-only
+      - no executable input is granted execute permission
+    emits: [validated_input_manifest, intake_report]
+
+  - id: TR-002
+    from: INTAKE_VALIDATED
+    to: DEFINING
+    actor: main_agent
+    event: definition.dispatched
+    guards:
+      - TaskPacket schema valid
+      - new container and unique workspace allocated
+      - role is problem_definition_router
+    emits: [task_packet, container_lease]
+
+  - id: TR-003
+    from: DEFINING
+    to: DEFINITION_REVIEW
+    actor: problem_definition_router
+    event: definition.submitted
+    guards:
+      - ResultPacket and ArtifactManifest schema valid
+      - output paths remain inside assigned write_root
+    emits: [definition_candidate_manifest]
+
+  - id: TR-004
+    from: DEFINITION_REVIEW
+    to: UNDERSTANDING
+    actor: main_agent
+    event: definition.promoted
+    guards:
+      - subproblem, objective, constraint, unit and attachment coverage gates pass
+      - manifest content hashes independently recomputed
+      - two role-specific TaskPackets schema valid
+    emits: [promoted_definition_manifest, understanding_task_packets]
+
+  - id: TR-005
+    from: UNDERSTANDING
+    to: UNDERSTANDING_REVIEW
+    actor: orchestrator
+    event: understanding.joined
+    guards:
+      - both required ResultPackets received or explicitly waived by main_agent
+      - authors used distinct containers and write roots
+      - all cited evidence has locators and hashes
+    emits: [evidence_candidate_manifest, data_candidate_manifest]
+
+  - id: TR-006
+    from: UNDERSTANDING_REVIEW
+    to: MODEL_DESIGN
+    actor: main_agent
+    event: understanding.promoted
+    guards:
+      - source quality, data lineage, leakage and assumption gates pass
+      - manifests promoted by hash
+    emits: [promoted_understanding_manifest, model_design_task_packet]
+
+  - id: TR-007
+    from: MODEL_DESIGN
+    to: SPECIALIST_CREATION
+    actor: main_agent
+    event: model_blueprint.promoted
+    guards:
+      - baseline exists
+      - candidate comparison covers fit, identifiability, feasibility and complexity
+      - at least one specialist role selected by capability, not task identity
+      - each specialist receives a separate TaskPacket and container
+    emits: [promoted_model_blueprint_manifest, specialist_task_packets]
+
+  - id: TR-008
+    from: SPECIALIST_CREATION
+    to: COMPUTE_IMPLEMENTATION
+    actor: main_agent
+    event: specialist_outputs.promoted
+    guards:
+      - selected specialist outputs have compatible interfaces
+      - model constraints and validation hooks are traceable
+      - no task-specific branch scan finding
+    emits: [promoted_specialist_manifest, implementation_task_packet]
+
+  - id: TR-009
+    from: COMPUTE_IMPLEMENTATION
+    to: REPORT_ASSEMBLY
+    actor: main_agent
+    event: compute_outputs.promoted
+    guards:
+      - clean container smoke test passes
+      - dependency lock and entrypoint present
+      - result lineage connects inputs, code and seeds
+    emits: [promoted_compute_manifest, report_task_packet]
+
+  - id: TR-010
+    from: REPORT_ASSEMBLY
+    to: CANDIDATE_REVIEW
+    actor: visualization_report_author
+    event: report.submitted
+    guards:
+      - ResultPacket and ArtifactManifest schema valid
+      - each key claim has a source, code output, derivation or explicit assumption
+    emits: [candidate_manifest]
+
+  - id: TR-011
+    from: CANDIDATE_REVIEW
+    to: INDEPENDENT_VALIDATION
+    actor: main_agent
+    event: candidate.frozen
+    guards:
+      - candidate manifest hashes verified
+      - three fresh reviewer containers allocated
+      - reviewer inputs are immutable and identical by hash
+      - reviewers cannot access author state or peer reviews
+    emits: [immutable_candidate_manifest, reviewer_task_packets]
+
+  - id: TR-012
+    from: INDEPENDENT_VALIDATION
+    to: REVIEW_RECONCILIATION
+    actor: orchestrator
+    event: reviews.joined
+    guards:
+      - three schema-valid ReviewPackets received
+      - three distinct review profiles present
+      - independence attestations all true
+    emits: [three_review_packets]
+
+  - id: TR-013
+    from: REVIEW_RECONCILIATION
+    to: RELEASE_CANDIDATE
+    actor: main_agent
+    event: reviews.approved
+    guards:
+      - all hard gates pass
+      - no unresolved P0 or P1 defect
+      - material reviewer disagreement resolved by a new independent review when needed
+    emits: [review_approval_record, release_candidate_manifest]
+
+  - id: TR-014
+    from: REVIEW_RECONCILIATION
+    to: ANSWER_REVISION_DECISION
+    actor: main_agent
+    event: reviews.require_revision
+    guards:
+      - at least one actionable task-answer defect exists
+    emits: [revision_decision_work_item]
+
+  - id: TR-015
+    from: ANSWER_REVISION_DECISION
+    to: REVISION_AUTHORIZED
+    actor: main_agent
+    event: revision.decision_approved
+    guards:
+      - RevisionDecision schema valid and bound to current task and run
+      - real-task-derived taint retained
+      - revision target is an answer-author role in the current run
+      - no Agent identity, capability, system prompt, routing or shared implementation artifact is writable
+    emits: [revision_decision, answer_revision_task_packet]
+
+  - id: TR-016
+    from: REVISION_AUTHORIZED
+    to: DEFINING
+    actor: main_agent
+    event: revision.restart_from_definition
+    guards:
+      - defect affects definition or has unknown earliest impact
+      - new attempt_id allocated
+    emits: [task_packet]
+
+  - id: TR-017
+    from: REVISION_AUTHORIZED
+    to: UNDERSTANDING
+    actor: main_agent
+    event: revision.restart_from_understanding
+    guards:
+      - defect earliest impact is understanding
+      - all retained upstream inputs are promoted immutable snapshots
+      - new attempt_id allocated
+    emits: [task_packets]
+
+  - id: TR-018
+    from: REVISION_AUTHORIZED
+    to: MODEL_DESIGN
+    actor: main_agent
+    event: revision.restart_from_creation
+    guards:
+      - defect earliest impact is creation
+      - all retained upstream inputs are promoted immutable snapshots
+      - new attempt_id allocated
+    emits: [task_packet]
+
+  - id: TR-019
+    from: RELEASE_CANDIDATE
+    to: REGRESSION_TESTING
+    actor: main_agent
+    event: regression.authorized
+    guards:
+      - prompt and artifact versions frozen
+      - sealed benchmark plan exists
+      - benchmark curator has no prompt-authoring role
+    emits: [benchmark_task_packet]
+
+  - id: TR-020
+    from: REGRESSION_TESTING
+    to: RELEASE_REVIEW
+    actor: benchmark_curator
+    event: regression.completed
+    guards:
+      - original historical tasks are reported separately from primary generalization metrics
+      - hidden variants and independently reviewed unseen tasks completed
+      - at least three independent runs per evaluated version
+      - report contains no hidden task or answer details
+    emits: [anonymized_benchmark_report, regression_report]
+
+  - id: TR-021
+    from: RELEASE_REVIEW
+    to: RELEASED
+    actor: main_agent
+    event: release.approved
+    guards:
+      - hard gates all pass
+      - no statistically or practically material unseen-task regression
+      - stability, cost and latency budgets pass
+      - no task-specialization finding
+      - release manifest hashes verified
+      - any Agent-body release consumes only a candidate-bound opaque pass receipt in the separate release-gate ledger
+    emits: [release_manifest, release_decision]
+
+  - id: TR-022
+    from: RELEASE_REVIEW
+    to: RELEASE_REJECTED
+    actor: main_agent
+    event: release.rejected_for_capability_defect
+    guards:
+      - evaluation evidence requires release rejection or rollback
+      - no research request, DTP, MAP or Agent-body motivation is emitted
+    emits: [release_rejection_report, rollback_decision]
+
+  - id: TR-023
+    from: FAILED_RECOVERABLE
+    to: INTAKE_VALIDATED
+    actor: main_agent
+    event: recovery.retry_authorized
+    guards:
+      - failure classified transient or corrected
+      - retry budget remains
+      - prior workspace sealed
+      - new attempt_id, container and workspace allocated
+    emits: [recovery_record, task_packet]
+
+agent_body_modification_subprotocol:
+  construction_machine:
+    states:
+      - CONTROL_AUTHORIZED
+      - CANDIDATE_SOURCED
+      - PROPOSED
+      - ADMITTED
+      - REJECTED
+      - MERGED
+    transitions:
+      - [CONTROL_AUTHORIZED, CANDIDATE_SOURCED]
+      - [CANDIDATE_SOURCED, PROPOSED]
+      - [PROPOSED, ADMITTED]
+      - [PROPOSED, REJECTED]
+      - [ADMITTED, MERGED]
+    accepted_control_sources: [DIRECT_USER, INDEPENDENT_GENERAL_RESEARCH]
+    accepted_control_carriers:
+      - DirectUserExecutableInstructionV1
+      - IndependentGeneralResearchManifestV1
+      - DTPV1
+      - MAPV1
+      - AgentBodyControlAuthorizationV1
+    accepted_candidate_carriers:
+      - AgentBodyCandidateSourceV1
+      - AgentBodyProposalV1
+      - AgentBodyAdmissionV1
+      - AgentBodyMergeV1
+      - AgentBodyProvenanceV1
+    generic_parent_arrays: forbidden
+    evaluation_parent_edges: []
+    task_derived_parent_edges: []
+  release_gate_machine:
+    input_carrier: OpaqueEvaluationReceiptV1
+    input_fields:
+      - schema_version
+      - agent_id
+      - package_version
+      - candidate_sha256
+      - verification_plan_sha256
+      - opaque_receipt_sha256
+      - decision
+    terminal_states: [RELEASED, RELEASE_REJECTED]
+    rejected_actions: []
+    builder_feedback_fields: []
+    construction_authorization_edges: []
+
+error_transitions:
+  recoverable:
+    from_states:
+      - DEFINING
+      - UNDERSTANDING
+      - MODEL_DESIGN
+      - SPECIALIST_CREATION
+      - COMPUTE_IMPLEMENTATION
+      - REPORT_ASSEMBLY
+      - INDEPENDENT_VALIDATION
+      - REGRESSION_TESTING
+    to: FAILED_RECOVERABLE
+    triggers:
+      - timeout
+      - resource_exhaustion
+      - transient_tool_failure
+      - schema_invalid_result
+      - missing_declared_artifact
+    actions:
+      - seal current workspace read-only
+      - preserve logs and partial manifest hashes
+      - revoke container and credentials
+      - emit failure_event with classification and retryability
+    retry_policy:
+      maximum_attempts_per_stage: 3
+      same_container_reuse: false
+      same_workspace_reuse: false
+      prompt_change_requires_new_prompt_version: true
+
+  security:
+    from_states: ["*"]
+    to: QUARANTINED
+    triggers:
+      - cross_workspace_access
+      - direct_peer_communication
+      - hidden_benchmark_disclosure
+      - hash_mismatch
+      - provenance_falsification
+      - task_specific_optimization_rule
+      - unauthorized_write
+    actions:
+      - terminate affected container
+      - revoke credentials
+      - quarantine all descendant artifacts
+      - preserve append-only forensic record
+      - require independent incident review before any retry
+
+  cancellation:
+    from_states: ["* except terminal"]
+    to: CANCELLED
+    triggers: [user_cancelled, main_agent_cancelled]
+    actions:
+      - stop new dispatches
+      - revoke active leases
+      - seal workspaces and record manifest hashes
+
+review_disagreement_policy:
+  material_disagreement:
+    conditions:
+      - verdict differs by two levels
+      - any P0 or P1 defect disputed
+      - reproduced key result conflicts across reviewers
+    resolution:
+      - do not average away the disagreement
+      - start a fourth fresh reviewer container with the disputed criterion only
+      - keep prior review packets hidden from the adjudicator
+      - main_agent records an explicit reconciliation decision

@@ -1,0 +1,194 @@
+schema_version: "2.5"
+rubric_name: general_mathematical_modeling_research_quality
+agent_version: generic-agent-v2.5
+language: zh-CN
+purpose: "内部版本比较和质量诊断；不对应任何竞赛成绩、排名或获奖概率。"
+
+precondition:
+  hard_gates_source: gates.yaml
+  rule: "任何 hard gate 失败时，质量得分仅用于诊断，不得用于发布补偿。"
+
+rating_scale:
+  0:
+    label: absent_or_invalid
+    anchor: "缺失、不可用、与任务冲突，或证据表明结论无效。"
+  1:
+    label: major_defect
+    anchor: "做出尝试，但存在重大遗漏、错误或不可追溯部分。"
+  2:
+    label: partial
+    anchor: "基本方向合理，但覆盖、证据、验证或实现明显不足。"
+  3:
+    label: complete
+    anchor: "达到任务所需的完整和可信水平，仅有轻微非关键缺陷。"
+  4:
+    label: robust
+    anchor: "完整、清晰、可追溯，并有独立或对抗性证据支持；明确处理边界与失败模式。"
+
+scoring:
+  formula: "criterion_score = weight * rating / 4"
+  total_max: 100
+  missing_evidence_policy: "没有要求的可核验证据时，评分不得高于 1。"
+  not_applicable_policy: "只有任务规范验证者预先批准才可标记 N/A；权重在同一阶段内按比例重分配。"
+
+phases:
+  definition:
+    name: 定义
+    weight: 20
+    minimum_release_percentage: 70
+    criteria:
+      - id: R.D1
+        name: 问题与子任务覆盖
+        weight: 4
+        capability_refs: [D.REQUIREMENT.COVERAGE]
+        evidence: [requirement_inventory, coverage_matrix]
+      - id: R.D2
+        name: 目标与成功条件
+        weight: 4
+        capability_refs: [D.OBJECTIVE.IDENTIFY, D.ACCEPTANCE.SPECIFY]
+        evidence: [objective_register, acceptance_criteria]
+      - id: R.D3
+        name: 约束与边界
+        weight: 4
+        capability_refs: [D.CONSTRAINT.TRACE]
+        evidence: [constraint_implementation_validation_matrix]
+      - id: R.D4
+        name: 变量、单位与附件映射
+        weight: 4
+        capability_refs: [D.VARIABLE.UNIT, D.ATTACHMENT.MAP]
+        evidence: [variable_dictionary, attachment_lineage]
+      - id: R.D5
+        name: 歧义与需求追踪
+        weight: 4
+        capability_refs: [D.AMBIGUITY.MANAGE]
+        evidence: [ambiguity_register, bidirectional_traceability]
+
+  understanding:
+    name: 理解
+    weight: 20
+    minimum_release_percentage: 70
+    criteria:
+      - id: R.U1
+        name: 数据语义与质量
+        weight: 4
+        capability_refs: [U.DATA.SCHEMA, U.DATA.QUALITY]
+        evidence: [data_dictionary, quality_report, transformation_lineage]
+      - id: R.U2
+        name: 来源质量与主张溯源
+        weight: 4
+        capability_refs: [U.SOURCE.PROVENANCE]
+        evidence: [source_ledger, claim_source_links]
+      - id: R.U3
+        name: 领域机制与适用边界
+        weight: 4
+        capability_refs: [U.MECHANISM.UNDERSTAND]
+        evidence: [mechanism_map, applicability_notes]
+      - id: R.U4
+        name: 假设合理性与偏差
+        weight: 4
+        capability_refs: [U.ASSUMPTION.BIAS]
+        evidence: [assumption_register, bias_analysis]
+      - id: R.U5
+        name: 不确定性与泄漏防护
+        weight: 4
+        capability_refs: [U.UNCERTAINTY.CHARACTERIZE, U.DATA.LEAKAGE]
+        evidence: [uncertainty_register, split_audit]
+
+  creation:
+    name: 创造
+    weight: 30
+    minimum_release_percentage: 70
+    criteria:
+      - id: R.C1
+        name: 基线质量
+        weight: 5
+        capability_refs: [C.BASELINE.ESTABLISH]
+        evidence: [baseline_definition, baseline_results]
+      - id: R.C2
+        name: 模型适配与选择理由
+        weight: 5
+        capability_refs: [C.MODEL.FIT]
+        evidence: [candidate_comparison, selection_rationale]
+      - id: R.C3
+        name: 数学结构与推导正确性
+        weight: 5
+        capability_refs: [C.MODEL.FIT, C.IDENTIFIABILITY.CHECK]
+        evidence: [model_specification, derivation_checks]
+      - id: R.C4
+        name: 算法与实现适当性
+        weight: 5
+        capability_refs: [C.ALGORITHM.SELECT, C.COMPLEXITY.CONTROL]
+        evidence: [algorithm_rationale, termination_record, resource_profile]
+      - id: R.C5
+        name: 解的可行性与有效性
+        weight: 5
+        capability_refs: [C.FEASIBILITY.PRESERVE]
+        evidence: [feasibility_certificate, residual_report]
+      - id: R.C6
+        name: 可解释性与可用性
+        weight: 5
+        capability_refs: [C.INTERPRETABILITY.PROVIDE]
+        evidence: [interpretation_map, decision_relevance]
+
+  validation:
+    name: 验证
+    weight: 30
+    minimum_release_percentage: 70
+    criteria:
+      - id: R.V1
+        name: 独立复算与数值核验
+        weight: 5
+        capability_refs: [V.RECOMPUTE.INDEPENDENT, V.CONSTRAINT.CHECK]
+        evidence: [independent_recalculation, constraint_check_report]
+      - id: R.V2
+        name: 敏感性、稳健性与情景覆盖
+        weight: 5
+        capability_refs: [V.SENSITIVITY.ANALYZE]
+        evidence: [sensitivity_report, scenario_report]
+      - id: R.V3
+        name: 随机稳定性与尾部风险
+        weight: 5
+        capability_refs: [V.STOCHASTIC.STABILITY]
+        evidence: [repeated_run_statistics, worst_run_analysis]
+      - id: R.V4
+        name: 干净环境复现
+        weight: 5
+        capability_refs: [V.REPRODUCE.CLEAN]
+        evidence: [clean_room_log, environment_manifest]
+      - id: R.V5
+        name: 工件和文稿一致性
+        weight: 5
+        capability_refs: [V.CONSISTENCY.ARTIFACT]
+        evidence: [artifact_consistency_check]
+      - id: R.V6
+        name: 关键主张、局限性与外推边界
+        weight: 5
+        capability_refs: [V.CLAIM.TRACE, V.LIMITATION.DISCLOSE]
+        evidence: [claim_evidence_matrix, limitation_register]
+
+review_process:
+  blinded: true
+  author_reasoning_hidden: true
+  peer_reviews_hidden_until_submission: true
+  minimum_independent_review_channels:
+    - mechanical_checks
+    - independent_recalculation
+    - expert_judgment
+  ordinal_agreement:
+    metric: quadratic_weighted_kappa
+    target_minimum: 0.70
+    below_target_action: "重新校准量表并由独立裁决者复核，不得由自动评分器单独放行。"
+  critical_disagreement_policy: "任何 hard gate 的未解决分歧按失败处理。"
+
+reporting:
+  required:
+    - total_score
+    - phase_scores
+    - criterion_ratings
+    - evidence_references
+    - reviewer_agreement
+    - uncertainty_or_disagreement
+  forbidden_interpretations:
+    - award_probability
+    - competition_rank
+    - equivalence_to_external_judging

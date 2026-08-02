@@ -1,0 +1,538 @@
+schema_version: "2.5"
+agent_version: "generic-agent-v2.5"
+agent_body_provenance_policy:
+  boundary_revision: sound-by-construction-r3e
+  agent_identity: generic-agent-v2.5
+  package_version: 2.5.0
+  authorization_sources: [DIRECT_USER, INDEPENDENT_GENERAL_RESEARCH]
+  direct_user_carrier: DirectUserExecutableInstructionV1
+  direct_user_instruction_enum: [APPLY_REVIEWED_GENERIC_GOVERNANCE_CHANGE]
+  research_carrier: IndependentGeneralResearchManifestV1
+  research_manifest_payload: hashes-and-closed-enums-only
+  dtp_carrier: DTPV1
+  map_carrier: MAPV1
+  authorization_permissions: [CONSTRUCT_CANDIDATE, PROPOSE_CANDIDATE, ADMIT_CANDIDATE, PROMOTE_CANDIDATE]
+  closed_carriers_additional_properties: false
+  free_text_in_construction_control: false
+  candidate_source_carrier: AgentBodyCandidateSourceV1
+  proposal_carrier: AgentBodyProposalV1
+  admission_carrier: AgentBodyAdmissionV1
+  merge_carrier: AgentBodyMergeV1
+  provenance_carrier: AgentBodyProvenanceV1
+  construction_ledger_entry: ConstructionLineageEntry
+  construction_ledger: ConstructionLineageLedger
+  direct_user_construction_lineage:
+    - DirectUserExecutableInstructionV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+  research_construction_lineage:
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+  evaluation_taint: permanent
+  evaluation_carrier: OpaqueEvaluationReceiptV1
+  opaque_evaluation_ledger_entry: OpaqueEvaluationReceiptEntry
+  opaque_evaluation_ledger: OpaqueEvaluationReceiptLedger
+  evaluation_destination: independent-release-gate-ledger-only
+  release_ledger: ReleaseGateLedger
+  release_terminal_states: [RELEASED, RELEASE_REJECTED]
+  release_rejection_actions: []
+  release_to_construction_edges: []
+  evaluation_construction_parent_allowed: false
+  task_derived_construction_parent_allowed: false
+  content_independent_tests: verification-only-accept-or-reject-candidate
+  verification_failure_successor_change_allowed: false
+  content_or_tool_strategy_branching_allowed: false
+  authorization_admission_promotion_content_inspection: false
+  main_agent_actions: [dispatch, write_prompts, review, approve, reject]
+  main_agent_writes:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_outputs:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_forbidden_outputs:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+    - BuildArtifact
+    - SolutionArtifact
+  effective_prompt_count: 17
+  subagent_profile_count: 16
+framework: "定义—理解—创造—验证"
+
+global_invariants:
+  communication:
+    topology: "star"
+    allowed_peer: "main_agent"
+    peer_to_peer_forbidden: true
+  isolation:
+    independent_workspace_required: true
+    other_agent_workspace_access_forbidden: true
+    promoted_artifacts_must_be_read_only: true
+  generalization:
+    task_specialization_forbidden: true
+    forbidden_content:
+      - "题号、题名或可识别的历史任务身份"
+      - "仅对单一任务有效的参数、答案、阈值或条件分支"
+      - "根据公开答案或讲评反向定制的流程"
+      - "绕过跨任务回归的局部修补"
+    admissible_change_conditions:
+      - "缺陷能够映射到固定的通用能力分类"
+      - "修改动机仅限经独立审查的直接用户治理或独立任务无关一般研究"
+      - "任何真实或合成任务及其所有衍生都不触发、证明或支持本体修改"
+      - "修改不包含内容、领域背景、标识符、参数、答案模式或工具策略分支"
+      - "预注册内容无关属性与契约测试仅用于验证"
+  evaluation_firewall:
+    real_task_policy:
+      purpose: "evaluation_and_current_answer_revision_only"
+      agent_body_change_source_forbidden: true
+      abstraction_does_not_remove_prohibition: true
+      cross_task_recurrence_does_not_remove_prohibition: true
+      forbidden_destinations:
+        - "identity"
+        - "capability_definition"
+        - "system_prompt"
+        - "routing"
+        - "shared_implementation"
+        - "tool_policy"
+        - "generic_template"
+      task_scope: "all real or synthetic tasks, variants, prompts, data, answers, scores, failures, reviews, and every derivative"
+      permitted_agent_change_sources:
+        - "independent-task-independent-general-research"
+        - "direct-user-governance-requirement"
+      preregistered_content_independent_tests: "verification-only-never-motivation"
+      content_specific_branching: "forbidden"
+    evaluation_only_material:
+      - "真实题面与附件"
+      - "评分与逐题分数"
+      - "讲评与 reviewer critique"
+      - "优秀解与参考解"
+      - "测试失败与精确失败位置"
+    forbidden_agent_body_destinations:
+      - "身份"
+      - "能力定义"
+      - "系统提示词"
+      - "路由"
+      - "共享实现"
+    single_task_action: "仅修订该次答案工件"
+    agent_body_change_requires:
+      - "可信入口 SourceProvenanceManifest 证明独立一般研究与任务无关"
+      - "任何任务或评测内容及其去标识、抽象、聚合或跨任务衍生均不得成为动机"
+      - "独立任务无关一般研究形成并由主 Agent 审查而非构造的通用 DTP"
+      - "DTPV1 与 MAPV1 均通过校验"
+      - "不含内容、领域背景、标识符、参数、答案模式、失败位置或工具策略分支"
+      - "预注册内容无关属性与契约测试标记为 verification-only"
+    core_builder_input_allowlist:
+      - "通用 core 工件"
+      - "独立任务无关一般研究 DTPV1"
+      - "同一独立研究来源的 MAPV1"
+      - "预注册内容无关 verification-only 验证通过结果"
+      - "独立审查的 DirectUserExecutableInstructionV1（不伪装成 Review exposure）"
+    core_builder_and_identity_build_mode_raw_evaluation_access: false
+  defect_taxonomy:
+    definition:
+      label: "定义"
+      capabilities:
+        - "子问题覆盖"
+        - "目标识别"
+        - "约束抽取"
+        - "变量与单位"
+        - "附件映射"
+    understanding:
+      label: "理解"
+      capabilities:
+        - "来源质量"
+        - "数据泄漏防护"
+        - "异常与缺失处理"
+        - "领域机制理解"
+        - "假设偏差分析"
+    creation:
+      label: "创造"
+      capabilities:
+        - "基线建立"
+        - "模型适配"
+        - "可辨识性"
+        - "算法选择"
+        - "可行性"
+    validation:
+      label: "验证"
+      capabilities:
+        - "独立复算"
+        - "敏感性与不确定性"
+        - "随机稳定性"
+        - "代码复现"
+        - "文稿与工件一致性"
+    orchestration:
+      label: "运行与编排"
+      capabilities:
+        - "任务路由"
+        - "工具选择"
+        - "上下文边界"
+        - "工件版本"
+        - "追踪完整性"
+
+sound_boundary_r3e:
+  control_sources: [DIRECT_USER, INDEPENDENT_GENERAL_RESEARCH]
+  control_carriers:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+  authorization_permissions: [CONSTRUCT_CANDIDATE, PROPOSE_CANDIDATE, ADMIT_CANDIDATE, PROMOTE_CANDIDATE]
+  construction_carriers:
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+  construction_ledger: ConstructionLineageLedger
+  opaque_evaluation_ledger: OpaqueEvaluationReceiptLedger
+  release_ledger: ReleaseGateLedger
+  release_gate_input: OpaqueEvaluationReceiptV1
+  release_gate_outputs: [RELEASED, RELEASE_REJECTED]
+  release_to_construction_edges: []
+  main_agent_actions: [dispatch, write_prompts, review, approve, reject]
+  main_agent_writes:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_outputs:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_forbidden_outputs:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+    - BuildArtifact
+    - SolutionArtifact
+
+roles:
+  - id: "main_agent"
+    display_order: 0
+    name: "主编排 Agent"
+    stage: "控制面与治理"
+    prompt_file: "system_prompts/00_main_agent.md"
+    unique_responsibility: "隔离原始评估证据、派遣任务、验证协议包并批准答案修订或 Agent 本体版本准入。"
+    forbidden_responsibilities:
+      - "把真实题面、附件、评分、讲评、优秀解或测试失败送入 Agent 本体构建上下文"
+      - "用单一任务证据修改身份、能力、系统提示词、路由或共享实现"
+      - "绕过 MAPV1 直接签发 Agent 本体修改"
+      - "构造任务工件、实现方案、求解任务，或生成 DTPV1、MAPV1、DirectUserExecutableInstructionV1"
+    required_outputs:
+      - "dispatch_records"
+      - "task_packets"
+      - "prompt_registry"
+      - "review_decisions"
+      - "approval_decisions"
+      - "rejection_decisions"
+
+  - id: "system_architect"
+    display_order: 1
+    name: "系统架构师"
+    stage: "基础设施与治理"
+    prompt_file: "system_prompts/01_system_architect.md"
+    unique_responsibility: "设计系统状态机、权限边界、任务流、工件生命周期、失败恢复和版本策略。"
+    forbidden_responsibilities:
+      - "实现平台运行代码"
+      - "解决具体建模任务"
+      - "执行成果评分或修改作者工件"
+    required_outputs:
+      - "ArchitectureSpec"
+      - "StateMachine"
+      - "PermissionMatrix"
+      - "FailureRecoveryPolicy"
+      - "ArtifactLifecycle"
+
+  - id: "sandbox_platform_engineer"
+    display_order: 2
+    name: "沙箱与平台构建工程师"
+    stage: "基础设施与治理"
+    prompt_file: "system_prompts/02_sandbox_platform_builder.md"
+    unique_responsibility: "依据已批准架构实现独立运行环境、工具接入、工件存储、追踪与可验证隔离。"
+    forbidden_responsibilities:
+      - "改变系统治理原则"
+      - "设计或评价数学模型"
+      - "接触隐藏基准答案"
+    required_outputs:
+      - "PlatformBuild"
+      - "IsolationEvidence"
+      - "ToolRegistry"
+      - "TraceSchema"
+      - "OperationsRunbook"
+
+  - id: "benchmark_curator"
+    display_order: 3
+    name: "基准集管理员"
+    stage: "基础设施与治理"
+    prompt_file: "system_prompts/03_benchmark_curator.md"
+    unique_responsibility: "构建、分层、锁箱和维护真实任务、隐藏变体与跨领域新任务及其评分证据。"
+    forbidden_responsibilities:
+      - "参与被测系统的模型设计"
+      - "向构建角色泄露任务身份、答案或失败位置"
+      - "用未经独立审查的合成任务作为主要指标"
+    required_outputs:
+      - "BenchmarkManifest"
+      - "CapabilityCoverageMap"
+      - "ContaminationRegister"
+      - "ScoringEvidence"
+      - "LockboxProtocol"
+
+  - id: "standards_delivery_manager"
+    display_order: 4
+    name: "规范与交付管理员"
+    stage: "基础设施与治理"
+    prompt_file: "system_prompts/04_standards_delivery_manager.md"
+    unique_responsibility: "维护内部工件规范、来源追踪规则、交付格式、版本清单与发布检查表。"
+    forbidden_responsibilities:
+      - "代替作者生成模型或结论"
+      - "代替独立评审员作质量判断"
+      - "按单一任务定制交付标准"
+    required_outputs:
+      - "ArtifactStandard"
+      - "ProvenanceStandard"
+      - "DeliverySchema"
+      - "ReleaseChecklist"
+      - "VersionPolicy"
+
+  - id: "problem_definition_router"
+    display_order: 5
+    name: "问题定义与路由 Agent"
+    stage: "定义"
+    prompt_file: "system_prompts/05_problem_definition_router.md"
+    unique_responsibility: "将原始任务转化为可追踪的问题定义、验收条件和能力路由，不提出解法。"
+    forbidden_responsibilities:
+      - "选择最终数学模型"
+      - "编写实现代码或研究报告"
+      - "自行补造缺失需求"
+    required_outputs:
+      - "ProblemTree"
+      - "RequirementTrace"
+      - "VariableUnitTable"
+      - "ConstraintRegister"
+      - "RoutingPlan"
+
+  - id: "domain_evidence_researcher"
+    display_order: 6
+    name: "领域证据研究 Agent"
+    stage: "理解"
+    prompt_file: "system_prompts/06_domain_evidence_researcher.md"
+    unique_responsibility: "研究任务所需的领域机制、原始证据、公式适用条件与参数依据。"
+    forbidden_responsibilities:
+      - "决定最终模型结构"
+      - "捏造来源或用二手摘要替代可得原始来源"
+      - "修改原始数据"
+    required_outputs:
+      - "EvidenceLedger"
+      - "MechanismMap"
+      - "ApplicabilityRegister"
+      - "ParameterEvidence"
+      - "UncertaintyNotes"
+
+  - id: "data_assumption_analyst"
+    display_order: 7
+    name: "数据与假设 Agent"
+    stage: "理解"
+    prompt_file: "system_prompts/07_data_assumption_analyst.md"
+    unique_responsibility: "审计数据质量、建立数据字典、执行探索分析并维护显式假设及其偏差影响。"
+    forbidden_responsibilities:
+      - "以清洗名义篡改原始数据"
+      - "使用目标信息造成数据泄漏"
+      - "选择最终模型或撰写最终结论"
+    required_outputs:
+      - "DataDictionary"
+      - "DataQualityReport"
+      - "EDAReport"
+      - "AssumptionRegister"
+      - "LeakageAudit"
+
+  - id: "model_architect"
+    display_order: 8
+    name: "总体模型架构师"
+    stage: "创造"
+    prompt_file: "system_prompts/08_model_architect.md"
+    unique_responsibility: "基于已批准定义和理解工件建立基线、比较候选模型并形成统一数学蓝图。"
+    forbidden_responsibilities:
+      - "直接实现生产代码"
+      - "掩盖模型选择中的不确定性"
+      - "依据任务身份套用固定模型"
+    required_outputs:
+      - "BaselinePlan"
+      - "CandidateModelMatrix"
+      - "MathematicalBlueprint"
+      - "SelectionRationale"
+      - "ValidationPlan"
+
+  - id: "mechanistic_numerical_modeler"
+    display_order: 9
+    name: "机理与数值模拟 Agent"
+    stage: "创造"
+    prompt_file: "system_prompts/09_mechanism_numerical_modeler.md"
+    unique_responsibility: "设计几何、动力学、微分方程、信号处理及数值计算方案，并说明误差与稳定性。"
+    forbidden_responsibilities:
+      - "越权替代统计、优化或总体架构角色"
+      - "忽略量纲、边界条件或离散误差"
+      - "根据已知答案反调参数"
+    required_outputs:
+      - "MechanisticFormulation"
+      - "NumericalMethodSpec"
+      - "BoundaryInitialConditions"
+      - "ErrorBudget"
+      - "InterfaceContract"
+
+  - id: "statistical_learning_modeler"
+    display_order: 10
+    name: "统计与学习 Agent"
+    stage: "创造"
+    prompt_file: "system_prompts/10_statistical_learning_modeler.md"
+    unique_responsibility: "设计统计推断、预测、分类、时序与不确定性建模方案及无泄漏评估。"
+    forbidden_responsibilities:
+      - "把相关性直接解释为因果"
+      - "在评估集上选模或调参"
+      - "只报告单一性能数字而不分析不确定性"
+    required_outputs:
+      - "StatisticalFormulation"
+      - "EvaluationDesign"
+      - "LeakageControls"
+      - "UncertaintyPlan"
+      - "InterfaceContract"
+
+  - id: "optimization_decision_modeler"
+    display_order: 11
+    name: "优化与决策 Agent"
+    stage: "创造"
+    prompt_file: "system_prompts/11_optimization_decision_modeler.md"
+    unique_responsibility: "设计规划、调度、网络、鲁棒及多目标优化方案并验证可行性与决策含义。"
+    forbidden_responsibilities:
+      - "把求解器状态等同于问题正确性"
+      - "遗漏硬约束或隐藏不可行解"
+      - "用特定答案范围限制搜索"
+    required_outputs:
+      - "OptimizationFormulation"
+      - "FeasibilityLogic"
+      - "SolverStrategy"
+      - "OptimalityEvidencePlan"
+      - "InterfaceContract"
+
+  - id: "compute_reproducibility_engineer"
+    display_order: 12
+    name: "计算与复现工程师"
+    stage: "创造"
+    prompt_file: "system_prompts/12_computation_reproducibility_engineer.md"
+    unique_responsibility: "把批准的数学蓝图实现为模块化、可测试、可追踪并可在干净环境复现的计算工件。"
+    forbidden_responsibilities:
+      - "擅自改变模型定义或数据语义"
+      - "手工修改结果文件"
+      - "依赖未声明的本地状态"
+    required_outputs:
+      - "ExecutableArtifact"
+      - "TestSuite"
+      - "EnvironmentLock"
+      - "RunManifest"
+      - "ResultManifest"
+
+  - id: "visualization_report_author"
+    display_order: 13
+    name: "可视化与报告 Agent"
+    stage: "创造"
+    prompt_file: "system_prompts/13_visualization_report_writer.md"
+    unique_responsibility: "将已验证工件转化为准确、清晰、可追溯的图表与研究报告，不创造未经验证的新结果。"
+    forbidden_responsibilities:
+      - "修改数值以改善叙事"
+      - "隐藏局限性或不确定性"
+      - "引用不存在或无法追溯的来源"
+    required_outputs:
+      - "FigureManifest"
+      - "ReportDraft"
+      - "ClaimEvidenceMap"
+      - "LimitationSection"
+      - "ConsistencyChecklist"
+
+  - id: "mathematical_reviewer"
+    display_order: 14
+    name: "数学逻辑评审员"
+    stage: "验证"
+    prompt_file: "system_prompts/14_mathematical_logic_reviewer.md"
+    unique_responsibility: "独立审查假设、推导、模型适配、边界条件、可辨识性、可行性和创新主张。"
+    forbidden_responsibilities:
+      - "直接修改作者工件"
+      - "查看作者隐含推理或其他评审意见"
+      - "给构建角色提供具体任务解法"
+    required_outputs:
+      - "LogicReview"
+      - "DefectEvidence"
+      - "ReproductionSteps"
+      - "AcceptanceTests"
+      - "Verdict"
+
+  - id: "reproducibility_reviewer"
+    display_order: 15
+    name: "数值与复现评审员"
+    stage: "验证"
+    prompt_file: "system_prompts/15_numerical_reproducibility_reviewer.md"
+    unique_responsibility: "在重新创建的环境中独立复算关键结果，审查约束残差、稳定性和完整复现。"
+    forbidden_responsibilities:
+      - "继承作者运行状态或缓存"
+      - "修补作者代码后宣称通过"
+      - "用作者日志代替独立证据"
+    required_outputs:
+      - "ReproductionReport"
+      - "NumericalAudit"
+      - "ResidualReport"
+      - "StabilityReport"
+      - "Verdict"
+
+  - id: "evidence_communication_reviewer"
+    display_order: 16
+    name: "表达与证据评审员"
+    stage: "验证"
+    prompt_file: "system_prompts/16_expression_evidence_reviewer.md"
+    unique_responsibility: "独立审查任务覆盖、论证完整性、图表与数值一致性、引用及工件可追溯性。"
+    forbidden_responsibilities:
+      - "仅做语言润色而忽略证据"
+      - "替作者补造结论或引用"
+      - "查看其他评审意见后再形成初审"
+    required_outputs:
+      - "CoverageReview"
+      - "ClaimEvidenceAudit"
+      - "ArtifactConsistencyAudit"
+      - "DefectEvidence"
+      - "Verdict"

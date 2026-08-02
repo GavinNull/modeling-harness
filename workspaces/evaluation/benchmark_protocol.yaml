@@ -1,0 +1,490 @@
+schema_version: "2.5"
+protocol_name: generalization_first_benchmark_protocol
+agent_version: generic-agent-v2.5
+agent_body_provenance_policy:
+  boundary_revision: sound-by-construction-r3e
+  agent_identity: generic-agent-v2.5
+  package_version: 2.5.0
+  authorization_sources: [DIRECT_USER, INDEPENDENT_GENERAL_RESEARCH]
+  direct_user_carrier: DirectUserExecutableInstructionV1
+  direct_user_instruction_enum: [APPLY_REVIEWED_GENERIC_GOVERNANCE_CHANGE]
+  research_carrier: IndependentGeneralResearchManifestV1
+  research_manifest_payload: hashes-and-closed-enums-only
+  dtp_carrier: DTPV1
+  map_carrier: MAPV1
+  authorization_permissions: [CONSTRUCT_CANDIDATE, PROPOSE_CANDIDATE, ADMIT_CANDIDATE, PROMOTE_CANDIDATE]
+  closed_carriers_additional_properties: false
+  free_text_in_construction_control: false
+  candidate_source_carrier: AgentBodyCandidateSourceV1
+  proposal_carrier: AgentBodyProposalV1
+  admission_carrier: AgentBodyAdmissionV1
+  merge_carrier: AgentBodyMergeV1
+  provenance_carrier: AgentBodyProvenanceV1
+  construction_ledger_entry: ConstructionLineageEntry
+  construction_ledger: ConstructionLineageLedger
+  direct_user_construction_lineage:
+    - DirectUserExecutableInstructionV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+  research_construction_lineage:
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+  evaluation_taint: permanent
+  evaluation_carrier: OpaqueEvaluationReceiptV1
+  opaque_evaluation_ledger_entry: OpaqueEvaluationReceiptEntry
+  opaque_evaluation_ledger: OpaqueEvaluationReceiptLedger
+  evaluation_destination: independent-release-gate-ledger-only
+  release_ledger: ReleaseGateLedger
+  release_terminal_states: [RELEASED, RELEASE_REJECTED]
+  release_rejection_actions: []
+  release_to_construction_edges: []
+  evaluation_construction_parent_allowed: false
+  task_derived_construction_parent_allowed: false
+  content_independent_tests: verification-only-accept-or-reject-candidate
+  verification_failure_successor_change_allowed: false
+  content_or_tool_strategy_branching_allowed: false
+  authorization_admission_promotion_content_inspection: false
+  main_agent_actions: [dispatch, write_prompts, review, approve, reject]
+  main_agent_writes:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_outputs:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_forbidden_outputs:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+    - BuildArtifact
+    - SolutionArtifact
+  effective_prompt_count: 17
+  subagent_profile_count: 16
+language: zh-CN
+
+sound_boundary_r3e:
+  control_sources: [DIRECT_USER, INDEPENDENT_GENERAL_RESEARCH]
+  control_carriers:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+  authorization_permissions: [CONSTRUCT_CANDIDATE, PROPOSE_CANDIDATE, ADMIT_CANDIDATE, PROMOTE_CANDIDATE]
+  construction_carriers:
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+  construction_ledger: ConstructionLineageLedger
+  opaque_evaluation_ledger: OpaqueEvaluationReceiptLedger
+  release_ledger: ReleaseGateLedger
+  release_gate_input: OpaqueEvaluationReceiptV1
+  release_gate_outputs: [RELEASED, RELEASE_REJECTED]
+  release_to_construction_edges: []
+  main_agent_actions: [dispatch, write_prompts, review, approve, reject]
+  main_agent_writes:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_outputs:
+    - dispatch_records
+    - task_packets
+    - prompt_registry
+    - review_decisions
+    - approval_decisions
+    - rejection_decisions
+  main_agent_forbidden_outputs:
+    - DirectUserExecutableInstructionV1
+    - IndependentGeneralResearchManifestV1
+    - DTPV1
+    - MAPV1
+    - AgentBodyControlAuthorizationV1
+    - AgentBodyCandidateSourceV1
+    - AgentBodyProposalV1
+    - AgentBodyAdmissionV1
+    - AgentBodyMergeV1
+    - AgentBodyProvenanceV1
+    - BuildArtifact
+    - SolutionArtifact
+
+objective:
+  primary: "测量跨任务可迁移的开放式数学建模研究能力。"
+  secondary:
+    - "验证端到端工件完整性与兼容性。"
+    - "比较候选与冻结基线的可靠性、复现性和资源效率。"
+  explicitly_not_claimed:
+    - "外部竞赛名次或奖项预测"
+    - "单个历史任务上的专门优化收益"
+    - "静态公开基准上的记忆能力"
+
+roles:
+  benchmark_author:
+    can_access: [assigned_private_task_draft]
+    cannot_access: [candidate_prompts, candidate_source, final_hidden_scores]
+  benchmark_validator:
+    can_access: [task_draft, data, reference_artifacts, grader]
+    cannot_access: [candidate_prompts, candidate_source]
+  benchmark_custodian:
+    can_access: [encrypted_benchmark_store, access_logs, release_manifest]
+    cannot_modify_agent: true
+  evaluator:
+    can_access:
+      - frozen_task_packet
+      - real_task_text
+      - real_task_attachments
+      - candidate_artifacts
+      - rubric
+      - evaluation_failures
+    cannot_access: [author_reasoning, other_reviews_before_submission]
+  builder:
+    can_access:
+      - generic_core_artifacts
+      - independent_task_independent_general_research_DTPV1
+      - independent_task_independent_general_research_MAPV1
+      - independently_reviewed_DirectUserExecutableInstructionV1
+      - preregistered_content_independent_verification_pass_results
+      - independent_task_independent_general_research_provenance
+    cannot_access:
+      - private_task_text
+      - private_data
+      - private_reference_artifacts
+      - per_private_task_score
+      - raw_audit_evidence
+      - grader_implementation
+      - critique
+      - reference_solution
+      - test_failure_detail
+      - real_task_derived_agent_change_evidence
+  main_agent:
+    can_access: [raw_audit_evidence, aggregate_metrics, mappings]
+    obligations:
+      - keep_agent_body_evaluation_outputs_limited_to_opaque_release_or_reject
+      - review_but_never_construct_independent_research_DTP_MAP
+      - enforce_feedback_firewall
+      - approve_artifact_promotion
+      - authorize_release_or_reject_for_the_exact_candidate
+
+tiers:
+  public_historical:
+    confidentiality: public
+    purpose:
+      - end_to_end_regression
+      - artifact_compatibility
+      - long_term_process_regression
+    primary_generalization_weight: 0.00
+    minimum_runs_per_instance: 3
+    interpretation: "参考证据；不得单独支持泛化提升声明。"
+  private_hidden_variants:
+    confidentiality: restricted
+    purpose:
+      - structural_understanding
+      - invariance_and_robustness
+      - anti_memorization
+    primary_generalization_weight: 0.45
+    minimum_runs_per_instance: 5
+    allowed_transform_families:
+      - unit_and_scale
+      - sampling_and_resolution
+      - noise_and_outliers
+      - missingness_mechanism
+      - constraint_composition
+      - output_representation
+      - resource_budget
+      - irrelevant_context
+    invariants_required:
+      - target_capability_labels
+      - internal_consistency
+      - valid_solution_space
+      - grader_fairness
+  private_novel:
+    confidentiality: lockbox
+    purpose:
+      - unseen_context_generalization
+      - unseen_data_generalization
+      - unseen_constraint_composition
+    primary_generalization_weight: 0.55
+    minimum_runs_per_instance: 5
+    independent_authoring_required: true
+    independent_validation_required: true
+    public_source_copy_forbidden: true
+
+task_family_strata:
+  - mechanistic_and_dynamical
+  - statistical_and_predictive
+  - optimization_and_decision
+  - spatial_network_and_geometric
+  - hybrid_multi_stage
+minimum_family_coverage:
+  release_total: 4
+  private_novel: 3
+  no_single_family_share_above: 0.35
+
+task_quality_validation:
+  validators_per_private_task_min: 2
+  author_may_validate_own_task: false
+  checks:
+    - id: TQ-01
+      name: specification_sufficiency
+      reject_if: "关键成功条件依赖未提供信息或唯一隐藏解释。"
+    - id: TQ-02
+      name: data_integrity
+      reject_if: "数据模式、单位、键、时间或参考计算不自洽。"
+    - id: TQ-03
+      name: feasibility
+      reject_if: "在声明资源范围内无法形成至少一种合理研究方案。"
+    - id: TQ-04
+      name: grader_validity
+      reject_if: "评分器拒绝合理等价解或接受明显无效捷径。"
+    - id: TQ-05
+      name: difficulty_calibration
+      reject_if: "难度与目标能力标签不匹配，或主要难度来自无关繁琐工作。"
+    - id: TQ-06
+      name: contamination_risk
+      reject_if: "任务或参考工件实质复制公开材料，或已进入构建上下文。"
+    - id: TQ-07
+      name: scoring_coverage
+      reject_if: "硬门槛、质量量表和任务特有正确性检查不能共同覆盖核心目标。"
+
+execution:
+  isolation:
+    new_container_per_run: true
+    writable_layer_reused: false
+    raw_inputs_read_only: true
+    other_agent_workspaces_mounted: false
+    evaluator_inherits_author_state: false
+    network_default: deny
+  frozen_run_manifest_fields:
+    - system_version
+    - prompt_versions
+    - model_versions
+    - tool_versions
+    - container_image_digest
+    - dependency_lock_digest
+    - input_snapshot_digest
+    - random_seed
+    - token_budget
+    - compute_budget
+    - wall_time_budget
+    - network_policy
+  pairing:
+    compare_same_tasks: true
+    compare_same_seed_set: true
+    compare_same_resource_limits: true
+    compare_same_tool_permissions: true
+  formal_run_ledger:
+    include_failures: true
+    include_retries: true
+    include_partial_outputs: true
+    immutable_after_seal: true
+
+evaluation:
+  stages:
+    - benchmark_validity_gates
+    - mechanical_artifact_checks
+    - task_hard_gates
+    - independent_recalculation
+    - clean_room_reproduction
+    - blinded_expert_rubric
+    - repeated_run_stability
+    - cross_family_analysis
+    - operational_metrics
+  blinded_review:
+    hide_author_reasoning: true
+    hide_peer_reviews_until_submission: true
+    hide_candidate_identity_when_feasible: true
+  automated_grader:
+    may_release_alone: false
+    expert_calibration_required: true
+    adversarial_grader_tests_required: true
+
+metrics:
+  quality:
+    source: rubric.yaml
+    report:
+      - total_score
+      - phase_scores
+      - hard_gate_pass_rate
+      - primary_generalization_score
+      - public_regression_score
+  stability:
+    report:
+      - mean
+      - median
+      - standard_deviation
+      - p10
+      - worst_run
+      - hard_gate_pass_rate
+      - catastrophic_failure_rate
+  traceability:
+    report:
+      - critical_claim_trace_rate
+      - requirement_coverage_rate
+      - artifact_hash_match_rate
+  reproducibility:
+    report:
+      - clean_room_success_rate
+      - critical_result_recompute_rate
+      - time_to_reproduce
+  operations:
+    report:
+      - total_cost
+      - token_usage
+      - compute_time
+      - wall_time
+      - human_interventions
+      - tool_failures_and_retries
+
+statistical_analysis:
+  unit_of_analysis: task_family
+  candidate_baseline_design: paired
+  primary_method: stratified_paired_bootstrap
+  bootstrap_resamples_min: 10000
+  confidence_level: 0.95
+  report_point_estimate: true
+  report_interval: true
+  multiple_runs_nested_within_task: true
+  insufficient_evidence_if:
+    - family_coverage_below_protocol
+    - run_count_below_tier_minimum
+    - private_task_quality_gate_failed
+    - baseline_not_comparable
+  prohibition: "不得以单一汇总均值掩盖任务族退化或尾部失败。"
+
+contamination_controls:
+  public_task_risk: high
+  private_variant_risk: medium
+  private_novel_risk: lowest_not_zero
+  controls:
+    - encrypted_at_rest
+    - least_privilege_access
+    - immutable_access_logs
+    - semantic_neutral_canary_markers
+    - no_private_content_in_prompts_or_training
+    - no_per_task_feedback_to_builders
+    - no_real_task_feedback_to_agent_body_even_if_abstracted_or_aggregated
+    - aggregate_release_metrics_only
+    - evaluation_feedback_never_enters_DTP_MAP_research_requests_or_agent_body_motivation
+    - query_budget
+    - reserve_pool_rotation
+    - retire_on_exposure
+    - compare_public_private_gap
+  exposure_events:
+    - private_text_seen_by_builder
+    - private_reference_seen_by_builder
+    - grader_logic_seen_by_builder
+    - raw_evidence_with_identifying_details_seen_by_builder
+    - canary_found_outside_authorized_store
+  exposure_action: "立即隔离任务、停止其分数用于发布声明、审计传播范围并从未触碰保留池补充。"
+
+feedback_firewall:
+  raw_evidence_visibility: [main_agent, authorized_evaluation_governance]
+  builder_visibility:
+    - independent_task_independent_general_research_DTPV1
+    - independent_task_independent_general_research_MAPV1
+    - independently_reviewed_DirectUserExecutableInstructionV1
+    - preregistered_content_independent_verification_pass_result
+  translation_required_fields:
+    - capability_id
+    - abstract_defect
+    - independent_task_independent_research_basis
+    - no_task_or_evaluation_derivation
+    - optimization_goal
+    - preregistered_content_independent_verification_contracts
+    - forbidden_specifics_confirmed
+  translation_forbidden_fields:
+    - task_id
+    - task_title
+    - recognizable_background
+    - original_private_text
+    - exact_private_field_name
+    - target_specific_parameter
+    - expected_answer
+    - grader_implementation_detail
+  unsafe_to_abstract_action: human_governance_only
+
+modification_admission:
+  all_required:
+    - immutable_trusted_ingress_task_independent_general_research_provenance
+    - no_real_or_synthetic_task_or_evaluation_motivation
+    - no_anonymized_abstracted_aggregated_or_cross_task_derivative_motivation
+    - DTP_and_MAP_purpose_is_agent_body_modification_only
+    - maps_to_fixed_general_capability
+    - falsifiable_change_hypothesis
+    - no_content_domain_identifier_parameter_answer_pattern_or_tool_policy_branch
+    - preregistered_content_independent_tests_are_verification_only
+    - cross_domain_regression_plan
+    - at_least_one_unseen_task_in_validation
+    - explicit_rollback_point
+    - proposal_stage_MAPV1_valid
+    - merge_stage_cross_domain_regression_pass
+    - merge_stage_held_out_non_regression_pass
+    - merge_stage_full_regression_pass
+  single_task_failure_action: current_answer_artifact_revision_only
+  single_task_failure_packet: RevisionDecision
+  direct_user_governance_path: DirectUserExecutableInstructionV1_with_independent_review
+  forbidden_agent_body_inputs:
+    - real_task_text
+    - real_task_attachments
+    - score
+    - critique
+    - reference_solution
+    - test_failure_detail
+
+lockbox_policy:
+  panel_reuse_for_iterative_tuning: false
+  disjoint_release_panels_min: 2
+  feedback_per_panel:
+    allowed:
+      - pass_fail
+      - aggregate_quality
+      - capability_labels_for_opaque_agent_body_release_or_reject_only
+    forbidden:
+      - task_text
+      - per_task_score
+      - exact_failure_location
+      - expected_output
+      - any_DTP_or_MAP
+      - any_research_request
+      - any_Agent_body_motivation_or_builder_feedback
+  on_feedback_budget_exhausted: rotate_untouched_reserve_or_freeze
+
+release_claim:
+  allowed_only_if:
+    - all_gates_pass
+    - generalization_thresholds_pass
+    - two_disjoint_lockbox_panels_pass
+    - no_unresolved_P0_or_P1
+    - operational_budget_pass
+  wording: "候选版本在本协议覆盖的私有任务族上表现出可重复的通用能力改进。"
+  forbidden_wording:
+    - "已证明适用于所有数学建模问题"
+    - "内部得分等同外部竞赛成绩"
+    - "单个公开历史任务证明泛化"
