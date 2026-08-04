@@ -25,14 +25,12 @@ runtime-workspaces/
 .DS_Store
 Thumbs.db
 
-# Public-release boundary: evaluation inputs, private diagnostics, and generated
-# work products are never source-distribution material.  The complete benchmark
-# tree and tests remain local evaluation assets; this repository distributes the
-# frozen Agent runtime, prompts, configuration, documentation, and containers.
+# Public-release boundary: keep private diagnostics, evaluation inputs and
+# generated task outputs local.  This repository publishes the Agent runtime,
+# role configuration, prompts, architecture documents and source tests.
 .agent_deps/
 .tmp/
 output/
 research/
 benchmarks/
 pilot_runs/
-tests/
